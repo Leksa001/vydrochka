@@ -1,0 +1,1060 @@
+<!doctype html>
+<html lang="ru"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Выдрочка">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<script>if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js'));</script>
+</head><body>
+<title>Выдрочка</title>
+<meta name="theme-color" content="#EEE8E3">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
+<style>
+/* Макет: телефон по центру; на широком экране слева шпаргалка для показа, кабинет магазина раскрывается в широкое окно.
+   Цвета и формы взяты из дизайн-макетов команды (бежевый фон, чёрные пилюли, крупные скругления). Тема одна, светлая — так задумано брендом. */
+:root{
+  --bg:#EEE8E3; --paper:#F7F3EF; --card:#E6DED7; --ink:#1E1A17; --ink-2:#4A433E; --muted:#857B74; --line:#DDD3CB; --white:#FFFFFF;
+  --ok:#3D7A57; --ok-bg:#E1EDE4; --warn:#9A6414; --warn-bg:#F3E6CF; --bad:#A8443A; --bad-bg:#F3DEDA;
+  --f:"Manrope",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  --r-xl:28px; --r-l:20px; --r-m:14px; --pill:999px;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--card);color:var(--ink);font-family:var(--f);font-size:15px;line-height:1.4;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none;padding:0}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+img{display:block;max-width:100%}
+h1,h2,h3{margin:0;text-wrap:balance;letter-spacing:-.02em}
+p{margin:0}
+.num{font-variant-numeric:tabular-nums}
+
+#stage{height:100%;display:flex;justify-content:center;align-items:center;gap:40px;padding:24px}
+#guide{width:320px;flex:none;display:flex;flex-direction:column;gap:14px;max-height:100%;overflow:auto}
+#guide h2{font-size:22px}
+#guide .lead{color:var(--ink-2);font-size:14px}
+#guide ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+#guide li button{width:100%;text-align:left;background:var(--paper);border-radius:var(--r-m);padding:10px 12px;display:flex;gap:10px;align-items:flex-start;font-size:14px}
+#guide li button:hover{background:var(--white)}
+#guide li b{flex:none;width:22px;height:22px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-size:12px}
+#guide .links{display:flex;flex-wrap:wrap;gap:8px}
+#phone{width:400px;height:min(860px,100%);background:var(--bg);border-radius:44px;box-shadow:0 0 0 10px var(--ink),0 30px 60px rgba(30,26,23,.25);display:flex;flex-direction:column;overflow:hidden;position:relative;flex:none;transition:width .25s}
+#phone.wide{width:min(1060px,calc(100vw - 420px));border-radius:24px;box-shadow:0 0 0 1px var(--line),0 30px 60px rgba(30,26,23,.15)}
+#screen{flex:1;overflow-y:auto;overflow-x:hidden;scroll-behavior:smooth}
+@media (max-width:900px){
+  #stage{padding:0;display:block}
+  #guide{display:none}
+  #phone,#phone.wide{width:100%;height:100%;border-radius:0;box-shadow:none}
+}
+
+/* общие элементы */
+.scr{padding:18px 16px 24px;display:flex;flex-direction:column;gap:18px}
+.top{display:flex;align-items:center;gap:12px}
+.top .grow{flex:1;min-width:0}
+.brand{display:flex;align-items:center;gap:10px}
+.brand img{width:48px;height:48px;border-radius:50%;mix-blend-mode:multiply}
+.brand b{font-size:24px;font-weight:800;letter-spacing:-.03em}
+.brand small{display:block;font-size:12px;color:var(--muted);font-weight:500}
+.ibtn{width:44px;height:44px;border-radius:50%;background:var(--paper);display:grid;place-items:center;flex:none}
+.ibtn svg{width:22px;height:22px}
+.back{display:flex;align-items:center;gap:8px;font-weight:600}
+.h1{font-size:30px;font-weight:800;line-height:1.1}
+.h2{font-size:20px;font-weight:800}
+.sub{color:var(--muted);font-size:13px}
+.row{display:flex;align-items:center;gap:10px}
+.between{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.link{font-size:14px;font-weight:600;color:var(--ink-2)}
+.search{display:flex;align-items:center;gap:10px;background:var(--paper);border-radius:var(--pill);padding:0 8px 0 18px;height:54px}
+.search svg{width:22px;height:22px;flex:none}
+.search input{flex:1;min-width:0;border:0;background:none;outline:none;font-size:15px}
+.search input::placeholder{color:var(--muted)}
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:0 16px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;height:42px;padding:0 18px;border-radius:var(--pill);border:1px solid var(--line);background:var(--paper);font-weight:600;font-size:14px;display:flex;align-items:center;gap:6px}
+.chip.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.btn{height:50px;padding:0 22px;border-radius:var(--pill);background:var(--ink);color:var(--paper);font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn.ghost{background:var(--paper);color:var(--ink);border:1px solid var(--line)}
+.btn.sm{height:38px;padding:0 16px;font-size:13px}
+.btn.block{width:100%}
+.btn:disabled{opacity:.4;cursor:default}
+.hscroll{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:0 16px 4px}
+.hscroll::-webkit-scrollbar{display:none}
+.pcard{flex:none;width:132px;display:flex;flex-direction:column;gap:6px;text-align:left;position:relative}
+.pcard .ph{background:var(--white);border-radius:var(--r-l);aspect-ratio:1/1.05;display:grid;place-items:center;overflow:hidden}
+.pcard .ph img{width:82%;height:82%;object-fit:contain}
+.pcard .st{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+.pcard .nm{font-size:13px;color:var(--ink-2)}
+.pcard .pr{font-weight:700}
+.heart{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.85);display:grid;place-items:center}
+.heart svg{width:17px;height:17px}
+.heart.on svg{fill:var(--ink)}
+.ad{position:absolute;left:8px;top:8px;font-size:10px;font-weight:700;background:rgba(255,255,255,.9);padding:2px 7px;border-radius:var(--pill);color:var(--ink-2)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid2 .pcard{width:auto}
+.banner{background:var(--card);border-radius:var(--r-xl);padding:22px;display:flex;align-items:center;gap:8px;overflow:hidden;position:relative;min-height:190px}
+.banner .txt{display:flex;flex-direction:column;gap:12px;position:relative;z-index:1;max-width:60%}
+.banner h2{font-size:28px;font-weight:800;line-height:1.05}
+.banner img{position:absolute;right:-6px;bottom:0;width:44%;height:auto;max-height:100%;object-fit:contain;object-position:bottom right;mix-blend-mode:multiply}
+.lookblock{display:grid;grid-template-columns:1.05fr 1fr;gap:10px}
+.lookblock .model{background:var(--card);border-radius:var(--r-xl);overflow:hidden;position:relative;display:flex;flex-direction:column}
+.lookblock .model h3{position:absolute;top:14px;left:16px;font-size:18px;font-weight:800;z-index:1}
+.lookblock .model img{flex:1;width:100%;object-fit:cover;mix-blend-mode:multiply;min-height:0}
+.lookblock .model .btn{position:absolute;left:10px;right:10px;bottom:10px;height:44px;font-size:13px}
+.mini{background:var(--paper);border-radius:var(--r-l);padding:8px;display:flex;gap:8px;align-items:center;text-align:left;width:100%}
+.mini img{width:58px;height:58px;object-fit:contain;flex:none;background:var(--white);border-radius:12px}
+.mini .t{min-width:0;flex:1}
+.mini b{display:block;font-size:13px}
+.mini span{display:block;font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini i{font-style:normal;font-weight:700;font-size:13px}
+.col{display:flex;flex-direction:column;gap:8px}
+.feat{display:flex;gap:10px}
+.feat button{flex:1;background:var(--paper);border-radius:var(--pill);height:46px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;font-weight:600}
+.feat button.on{background:var(--ink);color:var(--paper)}
+.ai{background:var(--card);border-radius:var(--r-xl);padding:20px;display:flex;gap:12px;align-items:center}
+.ai .txt{flex:1;display:flex;flex-direction:column;gap:8px}
+.ai h3{font-size:18px;font-weight:800}
+.ai p{font-size:13px;color:var(--ink-2)}
+.ai img{width:96px;border-radius:10px;transform:rotate(-4deg);box-shadow:0 6px 14px rgba(0,0,0,.12);border:4px solid var(--white)}
+.tabbar{display:flex;justify-content:space-around;background:var(--paper);border-top:1px solid var(--line);padding:8px 0 calc(8px + env(safe-area-inset-bottom,0px));flex:none}
+.tabbar[hidden]{display:none}
+.tabbar button{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;color:var(--muted);font-weight:600;padding:2px 10px;position:relative}
+.tabbar button svg{width:24px;height:24px}
+.tabbar button.on{color:var(--ink)}
+.tabbar button.on::after{content:"";position:absolute;bottom:-4px;left:12px;right:12px;height:2px;background:var(--ink);border-radius:2px}
+.tabbar .cnt{position:absolute;top:-3px;right:10px;background:var(--ink);color:var(--paper);font-size:10px;min-width:17px;height:17px;border-radius:9px;display:grid;place-items:center;padding:0 4px}
+.store{display:flex;gap:12px;align-items:center;background:var(--paper);border-radius:var(--r-l);padding:10px;text-align:left;width:100%}
+.store img{width:64px;height:64px;border-radius:14px;object-fit:cover;flex:none}
+.store .t{flex:1;min-width:0}
+.store b{display:block}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:var(--pill);white-space:nowrap}
+.store .pill,.avail .pill{white-space:normal}
+.pill.ok{background:var(--ok-bg);color:var(--ok)}
+.pill.warn{background:var(--warn-bg);color:var(--warn)}
+.pill.bad{background:var(--bad-bg);color:var(--bad)}
+.pill.n{background:var(--card);color:var(--ink-2)}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.pill.n::before{display:none}
+.panel{background:var(--paper);border-radius:var(--r-l);padding:16px;display:flex;flex-direction:column;gap:12px}
+.hero-img{background:var(--white);border-radius:var(--r-xl);aspect-ratio:1/1;display:grid;place-items:center;position:relative}
+.hero-img img{width:70%;height:70%;object-fit:contain}
+.sizes{display:flex;flex-wrap:wrap;gap:8px}
+.size{min-width:48px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--paper);font-weight:700}
+.size.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.size.off{color:var(--muted);text-decoration:line-through}
+.avail{display:flex;flex-direction:column;gap:8px}
+.avail .a{background:var(--paper);border-radius:var(--r-m);padding:12px;display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center}
+.avail .a .r{grid-row:span 2;display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+.note{font-size:12px;color:var(--muted)}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:13px;font-weight:700}
+.field input,.field select,.field textarea{height:48px;border-radius:var(--r-m);border:1px solid var(--line);background:var(--paper);padding:0 14px;outline:none}
+.field textarea{height:auto;padding:12px 14px;resize:vertical}
+.toast{position:absolute;left:16px;right:16px;bottom:84px;background:var(--ink);color:var(--paper);border-radius:var(--r-m);padding:12px 16px;font-size:14px;font-weight:600;z-index:20;animation:tin .2s ease-out}
+@keyframes tin{from{transform:translateY(10px);opacity:0}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}#screen{scroll-behavior:auto}}
+.msg{background:var(--paper);border-radius:18px 18px 18px 6px;padding:12px 14px;font-size:14px;align-self:flex-start;max-width:92%}
+.msg.me{background:var(--ink);color:var(--paper);border-radius:18px 18px 6px 18px;align-self:flex-end}
+.quick{display:flex;flex-wrap:wrap;gap:8px}
+.quick button{background:var(--paper);border:1px solid var(--line);border-radius:var(--pill);padding:8px 14px;font-size:13px;font-weight:600}
+.litem{display:grid;grid-template-columns:72px 1fr auto;gap:12px;align-items:center;background:var(--paper);border-radius:var(--r-l);padding:10px}
+.litem img{width:72px;height:72px;object-fit:contain;background:var(--white);border-radius:14px}
+.litem .t{min-width:0;display:flex;flex-direction:column;gap:2px}
+.litem .t b{font-size:14px}
+.litem .act{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+.sum{background:var(--ink);color:var(--paper);border-radius:var(--r-l);padding:16px;display:flex;flex-direction:column;gap:10px}
+.sum .between span{opacity:.75;font-size:13px}
+.sum .btn{background:var(--paper);color:var(--ink)}
+.map{background:#E3DBD2;border-radius:var(--r-xl);overflow:hidden}
+.map svg{display:block;width:100%;height:auto}
+.qrbox{background:var(--white);border-radius:var(--r-xl);padding:20px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.qr{width:170px;height:170px;display:grid;place-items:center}
+.code{font-size:28px;font-weight:800;letter-spacing:.08em}
+.empty{text-align:center;padding:30px 10px;display:flex;flex-direction:column;gap:12px;align-items:center;color:var(--ink-2)}
+.empty img{width:150px;mix-blend-mode:multiply}
+.seg{display:flex;background:var(--paper);border-radius:var(--pill);padding:4px;gap:4px}
+.seg button{flex:1;height:38px;border-radius:var(--pill);font-weight:700;font-size:13px}
+.seg button.on{background:var(--ink);color:var(--paper)}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--ink-2)}
+.check input{width:20px;height:20px;accent-color:var(--ink);flex:none;margin-top:1px}
+.demo{font-size:11px;font-weight:700;color:var(--warn);background:var(--warn-bg);padding:3px 8px;border-radius:6px;align-self:flex-start}
+
+/* кабинет магазина */
+.cab{display:grid;grid-template-columns:210px 1fr;min-height:100%}
+.cab nav{background:var(--ink);color:var(--paper);padding:20px 14px;display:flex;flex-direction:column;gap:4px}
+.cab nav .brand b{font-size:18px;color:var(--paper)}
+.cab nav .brand img{width:38px;height:38px;mix-blend-mode:normal;background:var(--paper)}
+.cab nav button{text-align:left;padding:10px 12px;border-radius:12px;font-weight:600;font-size:14px;color:rgba(247,243,239,.7)}
+.cab nav button.on{background:rgba(247,243,239,.12);color:var(--paper)}
+.cab nav .sp{flex:1}
+.cab nav select{background:rgba(247,243,239,.12);border:0;border-radius:10px;padding:8px;color:var(--paper);font-size:13px}
+.cab nav select option{color:var(--ink)}
+.cab main{padding:24px;display:flex;flex-direction:column;gap:18px;min-width:0}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.kpi{background:var(--paper);border-radius:var(--r-l);padding:14px;display:flex;flex-direction:column;gap:4px}
+.kpi b{font-size:26px;font-weight:800}
+.kpi span{font-size:12px;color:var(--muted);font-weight:600}
+.funnel{display:flex;flex-direction:column;gap:8px}
+.fbar{display:grid;grid-template-columns:150px 1fr 60px;gap:10px;align-items:center;font-size:13px}
+.fbar .tr{height:24px;background:var(--card);border-radius:8px;overflow:hidden}
+.fbar .tr i{display:block;height:100%;background:var(--ink);border-radius:8px}
+.tbl{overflow-x:auto;background:var(--paper);border-radius:var(--r-l)}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+tr:last-child td{border-bottom:0}
+td input.q{width:52px;height:32px;border:1px solid var(--line);border-radius:8px;background:var(--white);text-align:center}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+pre.json{background:var(--ink);color:#EDE6DF;border-radius:var(--r-m);padding:14px;font-size:12px;overflow-x:auto;margin:0;font-family:ui-monospace,Consolas,monospace}
+.tariffs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.tariff{background:var(--paper);border-radius:var(--r-l);padding:16px;display:flex;flex-direction:column;gap:8px}
+.tariff.cur{box-shadow:inset 0 0 0 2px var(--ink)}
+.tariff ul{margin:0;padding-left:18px;font-size:13px;color:var(--ink-2);display:flex;flex-direction:column;gap:4px}
+@media (max-width:760px){
+  .cab{grid-template-columns:1fr}
+  .cab nav{flex-direction:row;flex-wrap:wrap;padding:12px}
+  .cab nav .brand{width:100%}
+  .cab nav .sp{display:none}
+  .cab main{padding:16px}
+  .kpis{grid-template-columns:1fr 1fr}
+  .cols2,.tariffs{grid-template-columns:1fr}
+  .fbar{grid-template-columns:110px 1fr 44px}
+}
+</style>
+
+<div id="stage">
+  <aside id="guide">
+    <div class="brand"><img src="img/logo.jpg" alt=""><div><b>Выдрочка</b><small>прототип для команды · Тюмень</small></div></div>
+    <p class="lead">Кликабельный прототип по нашему дизайну. Товары, магазины и цифры здесь демонстрационные. Всё, что вы делаете, сохраняется только в этом браузере.</p>
+    <h2>Сценарий показа</h2>
+    <ol>
+      <li><button data-go="onb"><b>1</b>Анкета: город, размер, стиль, бюджет</button></li>
+      <li><button data-go="stylist"><b>2</b>ИИ-стилист собирает образ по запросу</button></li>
+      <li><button data-go="look"><b>3</b>Заменить вещь, увидеть маршрут по магазинам</button></li>
+      <li><button data-go="product"><b>4</b>Карточка: наличие по размерам в каждом магазине</button></li>
+      <li><button data-go="bookings"><b>5</b>Бронь на 24 часа и QR-код для магазина</button></li>
+      <li><button data-go="cabinet"><b>6</b>Кабинет магазина: выдать бронь по коду</button></li>
+      <li><button data-go="demand"><b>7</b>Спрос: что ищут в городе и не находят</button></li>
+    </ol>
+    <div class="links">
+      <a class="btn sm" href="docs.html" target="_blank" rel="noopener">Документация проекта</a>
+      <button class="btn sm ghost" data-go="reset">Сбросить демо</button>
+    </div>
+  </aside>
+  <div id="phone">
+    <div id="screen"></div>
+    <nav class="tabbar" id="tabbar"></nav>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tensorflow/4.22.0/tf.min.js"></script>
+<script>
+/* ================= ДАННЫЕ (демо) ================= */
+const STORES = [
+  {id:'stil1', name:'Стиль+',  branch:'ул. Республики',      x:47, y:38, sync:'1С:Розница', upd:8,    hours:'10:00–22:00', photo:'store1.jpg'},
+  {id:'stil2', name:'Стиль+',  branch:'ул. Мельникайте',     x:73, y:62, sync:'1С:Розница', upd:8,    hours:'10:00–21:00', photo:'store2.jpg'},
+  {id:'moda',  name:'Мода24',  branch:'ул. Ленина',          x:35, y:54, sync:'МойСклад',   upd:14,   hours:'10:00–21:00', photo:'store3.jpg'},
+  {id:'obuv',  name:'Обувь.Ру',branch:'ул. Герцена',         x:61, y:27, sync:'Excel-файл', upd:1560, hours:'10:00–20:00', photo:'store4.jpg'},
+  {id:'trendy',name:'Trendy',  branch:'ул. 50 лет Октября',  x:24, y:33, sync:'Эвотор',     upd:22,   hours:'10:00–22:00', photo:'store1.jpg'},
+  {id:'base',  name:'База',    branch:'ул. Широтная',        x:84, y:21, sync:'вручную',    upd:3000, hours:'11:00–20:00', photo:'store3.jpg'},
+];
+const ME = {x:50, y:50};
+const CATS = {top:'Верх', bottom:'Низ', shoes:'Обувь', bag:'Сумки'};
+const PRODUCTS = [
+  {id:'p1', name:'Свитер базовый',       cat:'top',    img:'sweater',   price:2990,  tone:'светлый', tags:['учёба','повседневный','базовое'], fit:'в размер',            stock:{base:{S:3,M:2}, moda:{M:1,L:1}}},
+  {id:'p2', name:'Свитер крупной вязки', cat:'top',    img:'sweater2',  price:3990,  tone:'светлый', tags:['повседневный','свидание'],        fit:'свободный крой',      stock:{trendy:{XS:1,S:2,M:2}}},
+  {id:'p3', name:'Джемпер чёрный',       cat:'top',    img:'jumper',    price:1990,  tone:'тёмный',  tags:['учёба','офис','базовое'],         fit:'в размер',            stock:{moda:{S:2,M:3,L:2}}},
+  {id:'p4', name:'Пиджак оверсайз',      cat:'top',    img:'blazer',    price:7990,  tone:'тёмный',  tags:['офис','учёба','классика'],        fit:'большемерит на размер',stock:{stil1:{S:1,M:2,L:1}, stil2:{M:1}}},
+  {id:'p5', name:'Юбка плиссе',          cat:'bottom', img:'skirt',     price:3990,  tone:'тёмный',  tags:['учёба','свидание','классика'],    fit:'в размер',            stock:{moda:{XS:1,S:2,M:1}}},
+  {id:'p6', name:'Юбка мини серая',      cat:'bottom', img:'skirt2',    price:2290,  tone:'серый',   tags:['свидание','повседневный','учёба'],fit:'маломерит',           stock:{trendy:{S:1,M:1}}},
+  {id:'p7', name:'Брюки широкие',        cat:'bottom', img:'trousers',  price:4490,  tone:'тёмный',  tags:['офис','классика','учёба'],        fit:'в размер',            stock:{stil1:{S:2,M:2,L:2}}},
+  {id:'p8', name:'Брюки палаццо',        cat:'bottom', img:'trousers2', price:4990,  tone:'тёмный',  tags:['офис','повседневный'],            fit:'длинные, на каблук',  stock:{base:{M:2,L:1}}},
+  {id:'p9', name:'Сапоги высокие',       cat:'shoes',  img:'boots',     price:12990, tone:'тёмный',  tags:['классика','свидание','офис'],     fit:'в размер',            stock:{obuv:{'37':1,'38':2,'39':1}}},
+  {id:'p10',name:'Ботинки на каблуке',   cat:'shoes',  img:'boots2',    price:8990,  tone:'тёмный',  tags:['повседневный','учёба','офис'],    fit:'узкая колодка',       stock:{obuv:{'36':1,'37':2,'38':1}, trendy:{'38':1}}},
+  {id:'p11',name:'Сумка с клапаном',     cat:'bag',    img:'bag',       price:6990,  tone:'тёмный',  tags:['офис','классика','свидание'],     fit:'',                    stock:{trendy:{one:3}}, promo:true},
+  {id:'p12',name:'Сумка мягкая',         cat:'bag',    img:'bag2',      price:4490,  tone:'тёмный',  tags:['учёба','повседневный','офис'],    fit:'',                    stock:{base:{one:2}, stil2:{one:1}}},
+];
+/* Атрибуты по схеме датасета Fashion Product Images (Kaggle): baseColour, season, usage + материал из карточки магазина */
+const ATTR = {
+  p1:{color:'молочный', material:'хлопок с акрилом', season:'осень–зима'}, p2:{color:'кремовый', material:'шерсть с акрилом', season:'зима'},
+  p3:{color:'чёрный', material:'вискоза', season:'всесезон'},              p4:{color:'графит', material:'костюмная ткань', season:'всесезон'},
+  p5:{color:'чёрный', material:'полиэстер', season:'всесезон'},            p6:{color:'серый меланж', material:'трикотаж', season:'осень–весна'},
+  p7:{color:'чёрный', material:'костюмная ткань', season:'всесезон'},      p8:{color:'тёмно-серый', material:'вискоза', season:'всесезон'},
+  p9:{color:'чёрный', material:'натуральная кожа', season:'осень–зима'},   p10:{color:'тёмно-коричневый', material:'замша', season:'осень–весна'},
+  p11:{color:'чёрный', material:'экокожа', season:'всесезон'},             p12:{color:'шоколадный', material:'мягкая экокожа', season:'всесезон'},
+};
+PRODUCTS.forEach(p => Object.assign(p, ATTR[p.id]));
+const MISSING = {'плать':'платья','пуховик':'пуховики','куртк':'куртки','кроссов':'кроссовки','джинс':'джинсы','пальто':'пальто','шуб':'шубы','рубаш':'рубашки','шарф':'шарфы'};
+const SEED_DEMAND = [{q:'платье миди до 6 000 ₽',n:23},{q:'пуховик длинный',n:17},{q:'кроссовки белые, 38',n:12},{q:'джинсы прямые, высокая посадка',n:9}];
+const SEED_STATS = {views:1240, cards:430, routes:186, bookings:41, visits:29};
+const CLOTH_SIZES = ['XS','S','M','L','XL'], SHOE_SIZES = ['36','37','38','39','40'];
+const STYLES = ['классика','повседневный','офис','учёба','свидание'];
+
+/* ================= СОСТОЯНИЕ ================= */
+const KEY = 'vydrochka-proto-v1';
+function fresh(){
+  const inv = {}; PRODUCTS.forEach(p => inv[p.id] = JSON.parse(JSON.stringify(p.stock)));
+  const now = Date.now();
+  return {profile:null, fav:[], looks:[], demand:[], reports:{}, stats:{}, inv,
+    bookings:[
+      {id:'b1', code:'ВД-3170', pid:'p4', sid:'stil1', sz:'M', created:now-3*3600e3, status:'active', seed:true},
+      {id:'b2', code:'ВД-8842', pid:'p7', sid:'stil1', sz:'S', created:now-26*3600e3, status:'done', seed:true},
+    ]};
+}
+let st; try { st = JSON.parse(localStorage.getItem(KEY)) || fresh(); } catch(e) { st = fresh(); }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(st)); } catch(e){} }
+let ui = {mode:'buyer', tab:'home', stack:[], chip:'all', feat:{size:false, style:false}, chat:[], lastLook:null, cabTab:'sum', cabStore:'stil1'};
+
+/* ================= ПОМОЩНИКИ ================= */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const rub = n => n.toLocaleString('ru-RU') + ' ₽';
+const P = id => PRODUCTS.find(p => p.id === id);
+const S = id => STORES.find(s => s.id === id);
+const km = (s, from = ME) => Math.hypot(s.x - from.x, s.y - from.y) * 0.06;
+const kmTxt = k => k < 1 ? Math.round(k * 1000 / 10) * 10 + ' м' : k.toFixed(1).replace('.', ',') + ' км';
+const walk = k => Math.max(2, Math.round(k * 13)) + ' мин пешком';
+const sizeFor = p => p.cat === 'bag' ? 'one' : p.cat === 'shoes' ? (st.profile?.shoe || '38') : (st.profile?.size || 'S');
+const sizesOf = p => p.cat === 'bag' ? ['one'] : p.cat === 'shoes' ? SHOE_SIZES : CLOTH_SIZES;
+const qty = (pid, sid, sz) => (st.inv[pid]?.[sid]?.[sz]) || 0;
+function where(p, sz = sizeFor(p)){
+  return Object.keys(st.inv[p.id] || {}).map(sid => ({s:S(sid), q:qty(p.id, sid, sz), sz}))
+    .filter(a => a.q > 0).map(a => ({...a, km:km(a.s)})).sort((a, b) => a.km - b.km);
+}
+function fresh_(s){
+  const m = s.upd;
+  if (m < 60) return {cls:'ok', t:`обновлено ${m} мин назад`};
+  if (m < 1440) return {cls:'ok', t:`обновлено ${Math.round(m/60)} ч назад`};
+  return {cls:'warn', t:`данные от ${Math.round(m/1440)} дн. назад — уточните по телефону`};
+}
+function stat(sid, k, n = 1){ st.stats[sid] = st.stats[sid] || {}; st.stats[sid][k] = (st.stats[sid][k] || 0) + n; }
+function toast(t){
+  const el = document.createElement('div'); el.className = 'toast'; el.textContent = t;
+  $('#phone').appendChild(el); setTimeout(() => el.remove(), 2600);
+}
+const ICON = {
+  search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>',
+  menu:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>',
+  filter:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>',
+  heart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg>',
+  home:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 10.5 12 4l8 6.5V20h-5.5v-5h-5v5H4z"/></svg>',
+  hanger:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 8a2 2 0 1 1 2-2c0 1.2-2 1.6-2 3v1l8.5 5.5c.8.5.4 1.5-.5 1.5H4c-.9 0-1.3-1-.5-1.5L12 10"/></svg>',
+  user:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.5-6 8-6s7 1.5 8 6"/></svg>',
+  spark:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3c.6 4.5 2.5 6.4 7 7-4.5.6-6.4 2.5-7 7-.6-4.5-2.5-6.4-7-7 4.5-.6 6.4-2.5 7-7Z"/></svg>',
+  back:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg>',
+  pin:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-6-5.3-6-11a6 6 0 0 1 12 0c0 5.7-6 11-6 11Z"/><circle cx="12" cy="10" r="2"/></svg>',
+  ticket:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M9 6v12" stroke-dasharray="2 2"/></svg>',
+};
+
+/* ================= ИИ-СТИЛИСТ (правила поверх реального каталога) ================= */
+function parseQuery(q){
+  const t = q.toLowerCase();
+  let budget = null;
+  const m = t.match(/(\d[\d\s]*\d|\d)\s*(к|k|тыс)?/);
+  if (m){ let n = parseInt(m[1].replace(/\s/g, ''), 10); if (m[2]) n *= 1000; if (n >= 500) budget = n; }
+  const tags = [];
+  if (/уч[её]б|универ|пар[ыау]|колледж|институт|тиу/.test(t)) tags.push('учёба');
+  if (/офис|работ|собес|делов/.test(t)) tags.push('офис');
+  if (/свидан|вечер|ресторан|праздн/.test(t)) tags.push('свидание');
+  if (/прогул|каждый день|повседнев|выходн/.test(t)) tags.push('повседневный');
+  if (/классик|строг/.test(t)) tags.push('классика');
+  let tone = null;
+  if (/т[её]мн|ч[её]рн/.test(t)) tone = 'тёмный';
+  if (/светл|бел|молочн|беж/.test(t)) tone = 'светлый';
+  const missing = Object.keys(MISSING).filter(k => t.includes(k)).map(k => MISSING[k]);
+  return {budget, tags, tone, missing};
+}
+function scoreP(p, q){
+  let sc = 0;
+  q.tags.forEach(tg => { if (p.tags.includes(tg)) sc += 3; });
+  if (q.tone && p.tone === q.tone) sc += 2;
+  if (st.profile?.style && p.tags.includes(st.profile.style)) sc += 1;
+  const w = where(p); if (!w.length) return null;
+  return sc - w[0].km * 0.4;
+}
+function buildLook(q, lock = {}, skip = []){
+  const cand = c => PRODUCTS.filter(p => p.cat === c && !skip.includes(p.id) && (!lock[c] || lock[c] === p.id))
+    .map(p => ({p, sc:scoreP(p, q)})).filter(x => x.sc !== null);
+  const tops = cand('top'), bottoms = cand('bottom'), shoes = [null, ...cand('shoes')], bags = [null, ...cand('bag')];
+  let best = null;
+  for (const a of tops) for (const b of bottoms) for (const c of shoes) for (const d of bags){
+    if (lock.shoes && !c) continue; if (lock.bag && !d) continue;
+    const items = [a, b, c, d].filter(Boolean);
+    const total = items.reduce((s, x) => s + x.p.price, 0);
+    if (q.budget && total > q.budget) continue;
+    const stores = new Set(items.map(x => where(x.p)[0].s.id));
+    const val = items.reduce((s, x) => s + x.sc, 0) + (c ? 4 : 0) + (d ? 2.5 : 0) - stores.size * 0.3 + (SC ? items.reduce((s, x, i) => items.slice(i + 1).reduce((t, y) => t + (compat(x.p.id, y.p.id) - 0.5) * 4, s), 0) : 0);
+    if (!best || val > best.val) best = {val, items, total};
+  }
+  if (!best) return null;
+  return {id:'l' + Date.now(), q, title:'', created:Date.now(),
+    items:best.items.map(x => { const w = where(x.p)[0]; return {pid:x.p.id, sid:w.s.id, sz:w.sz}; }),
+    total:best.total, skip:[...skip]};
+}
+function routeOrder(sids){
+  const left = [...new Set(sids)].map(S), out = []; let cur = ME, dist = 0;
+  while (left.length){ left.sort((a, b) => km(a, cur) - km(b, cur)); const n = left.shift(); dist += km(n, cur); out.push(n); cur = n; }
+  return {stores:out, dist};
+}
+
+/* ================= СОБСТВЕННЫЕ МОДЕЛИ (обучены с нуля, работают в браузере на TensorFlow.js; правила выше — запасной вариант) =================
+   intent — понимание запроса (синтетические фразы с опечатками), photo — CNN по фото (Fashion Product Images),
+   compat — сочетаемость вещей (Polyvore), cobuy — «с этим берут» (корзины H&M). Последние две посчитаны для каталога заранее: models/scores.json */
+let AI = null, AI_IMG = false;
+const IN_DIM = 2048;
+function intentVec(text){ // тот же код, что при обучении: символьные n-граммы 2..4, хэш FNV-1a
+  const v = new Float32Array(IN_DIM);
+  const t = text.toLowerCase().replace(/ё/g, 'е').replace(/[^a-zа-я ]+/g, ' ').split(/\s+/).filter(w => w.length > 1);
+  for (const w of t){ const s = ' ' + w + ' ';
+    for (let n = 2; n <= 4; n++) for (let i = 0; i + n <= s.length; i++){ let h = 2166136261; for (let k = i; k < i + n; k++){ h ^= s.charCodeAt(k); h = Math.imul(h, 16777619); } v[(h >>> 0) % IN_DIM] = 1; } }
+  return v;
+}
+const IL = {occasion:['учёба','офис','свидание','повседневный','классика'], tone:[null,'светлый','тёмный'], want:['top','bottom','shoes','bag'], missing:['платья','пуховики','куртки','кроссовки','джинсы','пальто','шубы','рубашки','шарфы']};
+const PH = {cat:['top','bottom','dress','shoes','bag','other'],
+  type:['футболка','рубашка','топ','свитер','кардиган','толстовка','пиджак','куртка','пальто','платье','джинсы','брюки','шорты','юбка','леггинсы','сапоги','ботильоны','туфли на каблуке','кроссовки','балетки','сандалии','обувь','сумка','клатч','рюкзак','шоппер','сумка','аксессуар'],
+  typeId:['tshirt','shirt','top','sweater','cardigan','sweatshirt','blazer','jacket','coat','dress','jeans','trousers','shorts','skirt','leggings','boots','ankle_boots','heels','sneakers','flats','sandals','shoes_other','handbag','clutch','backpack','tote','bag_other','other'],
+  color:['чёрный','белый','бежевый','серый','коричневый','синий','красный','розовый','зелёный','жёлтый','фиолетовый','разноцветный'],
+  usage:['повседневный','офис','повседневный',null]};
+const TYPE_MISS = {dress:'платья', jacket:'куртки', coat:'пальто', jeans:'джинсы', sneakers:'кроссовки', shirt:'рубашки'};
+const toneOf = c => ['белый','бежевый','жёлтый','розовый'].includes(c) ? 'светлый' : c === 'разноцветный' ? null : 'тёмный';
+const pct = x => Math.round(x * 100) + '%';
+let SC = null; // scores.json
+(async () => {
+  try {
+    if (!window.tf) return;
+    const [intent, scores] = await Promise.all([tf.loadLayersModel('models/intent/model.json'), fetch('models/scores.json').then(r => r.json())]);
+    SC = scores; AI = {intent}; render();
+    AI.photo = await tf.loadLayersModel('models/photo/model.json'); AI_IMG = true; render();
+  } catch(e){ console.warn('Модели не загрузились, работаем по правилам', e); }
+})();
+const aiTag = '<span class="pill ok">ИИ · свои модели</span>';
+function intentParse(text){
+  const q = parseQuery(text); // бюджет — регулярным выражением
+  const ps = tf.tidy(() => AI.intent.predict(tf.tensor2d(intentVec(text), [1, IN_DIM])).map(p => [...p.dataSync()]));
+  const [occ, tone, want, miss] = ps, ti = tone.indexOf(Math.max(...tone));
+  q.tags = IL.occasion.filter((_, i) => occ[i] > 0.5); q.tone = IL.tone[ti]; q.want = IL.want.filter((_, i) => want[i] > 0.5); q.missing = IL.missing.filter((_, i) => miss[i] > 0.5);
+  const parts = [q.tags.length && 'повод — ' + q.tags.join(', '), q.tone && 'тон — ' + q.tone + ' (' + pct(tone[ti]) + ')', q.want.length && 'ищете — ' + q.want.map(c => CATS[c].toLowerCase()).join(', '), q.missing.length && 'нет в каталоге — ' + q.missing.join(', '), q.budget && 'бюджет — ' + rub(q.budget)].filter(Boolean);
+  q.note = 'Модель запроса поняла: ' + (parts.join('; ') || 'ничего конкретного, беру ваш стиль из анкеты');
+  return q;
+}
+async function photoRead(file){
+  const img = await createImageBitmap(file), cv = document.createElement('canvas'); cv.width = 48; cv.height = 64;
+  const g = cv.getContext('2d'), s = Math.min(48 / img.width, 64 / img.height), w = img.width * s, h = img.height * s;
+  g.fillStyle = '#fff'; g.fillRect(0, 0, 48, 64); g.drawImage(img, (48 - w) / 2, (64 - h) / 2, w, h);
+  const ps = tf.tidy(() => AI.photo.predict(tf.browser.fromPixels(cv).toFloat().div(255).expandDims()).map(p => [...p.dataSync()]));
+  const top = (a, names) => { const i = a.indexOf(Math.max(...a)); return {i, name:names[i], p:a[i]}; };
+  return {cat:top(ps[0], PH.cat), type:top(ps[1], PH.type), color:top(ps[2], PH.color), usage:top(ps[3], PH.usage)};
+}
+const compat = (a, b) => SC?.compat?.[a]?.[b] ?? 0.5;
+function lookExplain(look){
+  const ids = look.items.map(i => i.pid), why = {};
+  ids.forEach(a => { const o = ids.filter(b => b !== a); if (!o.length) return; const best = o.reduce((x, b) => compat(a, b) > compat(a, x) ? b : x);
+    why[a] = `сочетается с «${P(best).name.toLowerCase()}» на ${pct(compat(a, best))} по модели Polyvore`; });
+  const pairs = []; ids.forEach((a, i) => ids.slice(i + 1).forEach(b => pairs.push(compat(a, b))));
+  const avg = pairs.length ? pairs.reduce((s, x) => s + x, 0) / pairs.length : 0;
+  return {reply:`Средняя сочетаемость вещей в образе — ${pct(avg)}. Учёл повод, тон, бюджет и наличие в вашем размере.`, why};
+}
+function addDemand(list){ (list || []).forEach(m => { m = String(m).toLowerCase().slice(0, 60); if (!m) return; const ex = st.demand.find(d => d.q === m); ex ? ex.n++ : st.demand.unshift({q:m, n:1}); }); }
+async function askStylistAI(text, file){
+  if (!file) return askStylist(text, intentParse(text));
+  let r; try { r = await photoRead(file); } catch(e){ toast('Не удалось прочитать фото'); return; }
+  const cat = r.cat.name, tone = toneOf(r.color.name), miss = TYPE_MISS[PH.typeId[r.type.i]];
+  if (r.cat.p < 0.8 || cat === 'other'){
+    ui.chat.push({me:false, html:`Фото-модель не уверена (${pct(r.cat.p)}): она обучена на студийных фото одной вещи на белом фоне. Сфотографируйте вещь отдельно на светлом фоне. Пока собираю образ по тексту запроса.`});
+    return askStylist(text, intentParse(text), true);
+  }
+  ui.chat.push({me:false, html:`<b>На фото:</b> ${r.type.name} (${pct(r.type.p)}), цвет ${r.color.name} (${pct(r.color.p)}), категория ${CATS[cat] ? CATS[cat].toLowerCase() : cat} (${pct(r.cat.p)})`});
+  // похожая вещь из наличия: та же категория, тот же тип и тон
+  const sim = CATS[cat] ? PRODUCTS.filter(p => p.cat === cat && where(p).length).map(p => ({p, s:(SC?.catalog_type?.[p.id] === PH.typeId[r.type.i] ? 3 : 0) + (p.tone === tone ? 2 : 0)})).sort((a, b) => b.s - a.s)[0] : null;
+  const q = {budget:+st.profile.budget || null, tags:[r.usage.name || st.profile.style].filter(Boolean), tone, missing:miss ? [miss] : [],
+    note:sim ? `Ближе всего из наличия — «${sim.p.name}». Собираю образ вокруг неё.` : 'Такой категории в каталоге нет, собираю образ в том же тоне.'};
+  if (sim && buildLook(q, {[cat]:sim.p.id})) ui.withItem = sim.p.id;
+  else if (sim) q.note = `Ближе всего из наличия — «${sim.p.name}», но с этой вещью образ не влезает в бюджет ${rub(q.budget)}. Собираю образ в том же тоне без неё.`;
+  askStylist(text || 'Собери похожий образ', q, true);
+}
+// Небольшие ответы для карточки, поиска и кабинета: ui.ai[key] = {wait} | {text} | {data} | {err}
+async function aiRun(key, fn){
+  ui.ai = ui.ai || {}; ui.ai[key] = {wait:true}; render();
+  try { const v = await fn(); ui.ai[key] = typeof v === 'string' ? {text:v} : {data:v}; }
+  catch(e){ console.warn(e); ui.ai[key] = {err:'Модель не смогла обработать запрос'}; }
+  render();
+}
+const aiState = key => (ui.ai || {})[key];
+function aiBox(key, empty = ''){
+  const a = aiState(key);
+  if (!a) return empty;
+  if (a.wait) return '<p class="note">Модель считает…</p>';
+  if (a.err) return `<p class="note" style="color:var(--bad,#b3261e)">${esc(a.err)}</p>`;
+  return a.text ? `<div class="msg" style="max-width:100%">${esc(a.text).replace(/\n/g, '<br>')}</div>` : '';
+}
+// «С этим берут»: соседи по корзинам H&M, только из других категорий и в наличии
+const cobuyFor = id => Object.entries(SC?.cobuy?.[id] || {}).filter(([b]) => P(b).cat !== P(id).cat && where(P(b)).length).sort((x, y) => y[1] - x[1]).slice(0, 3).map(([b]) => P(b));
+const AI_TASKS = {
+  fit: id => { const p = P(id), my = p.cat === 'shoes' ? st.profile.shoe : st.profile.size, all = p.cat === 'shoes' ? SHOE_SIZES : CLOTH_SIZES, i = all.indexOf(my);
+    const alt = /большемерит/.test(p.fit) ? all[i - 1] : /маломерит|узкая/.test(p.fit) ? all[i + 1] : null;
+    return `Вы обычно носите ${my}. Покупатели пишут: «${p.fit}». ` + (alt ? `Примерьте ${my} и ${alt}: забронируйте оба, оплатите только тот, что подойдёт.` : `Берите свой размер ${my}.`); },
+  search: q => { const r = intentParse(q), t = q.toLowerCase();
+    const ids = PRODUCTS.map(p => ({p, s:r.tags.filter(g => p.tags.includes(g)).length * 3 + (r.tone && p.tone === r.tone ? 2 : 0) + (r.want.includes(p.cat) ? 4 : 0) + (t.split(/\s+/).some(w => w.length > 3 && p.name.toLowerCase().includes(w.slice(0, -1))) ? 4 : 0)}))
+      .filter(x => x.s > 0).sort((a, b) => b.s - a.s).map(x => x.p.id);
+    return {ids, note:r.note, missing:r.missing}; },
+  demand: s => { const all = [...st.demand, ...SEED_DEMAND].sort((a, b) => b.n - a.n).slice(0, 2).map(d => `— Завезти: «${d.q}»: ${d.n} запросов без результата`);
+    const mine = PRODUCTS.filter(p => st.inv[p.id][s.id]);
+    const low = mine.filter(p => Object.values(st.inv[p.id][s.id]).reduce((a, b) => a + b, 0) <= 2).slice(0, 1).map(p => `— Дозаказать «${p.name}»: осталось ${Object.values(st.inv[p.id][s.id]).reduce((a, b) => a + b, 0)} шт.`);
+    const pair = mine.map(p => [p, cobuyFor(p.id)[0]]).filter(x => x[1]).slice(0, 1).map(([a, b]) => `— Повесить рядом с «${a.name}» вещь вроде «${b.name}»: такие вещи чаще всего покупают вместе (по корзинам H&M)`);
+    return [...all, ...low, ...pair].join('\n'); },
+  card: async file => { const r = await photoRead(file), cat = r.cat.name, same = PRODUCTS.filter(p => p.cat === cat).map(p => p.price);
+    return {name:r.type.name[0].toUpperCase() + r.type.name.slice(1) + ', ' + r.color.name, cat, articleType:`${r.type.name} (уверенность ${pct(r.type.p)})`, color:`${r.color.name} (${pct(r.color.p)})`,
+      tags:[r.usage.name].filter(Boolean), price_from:same.length ? Math.min(...same) : null, price_to:same.length ? Math.max(...same) : null,
+      description:`Категория «${CATS[cat] || cat}» (${pct(r.cat.p)}). Цена — диапазон похожих вещей в каталоге. Материал и сезон модель по фото не определяет — заполните вручную.${r.cat.p < 0.8 || cat === 'other' ? ' Модель не уверена в этом фото: лучше снять вещь отдельно на белом фоне.' : ''}`}; },
+};
+
+/* ================= НАВИГАЦИЯ ================= */
+function go(view, params = {}){ ui.stack.push({view, params}); render(true); }
+function back(){ ui.stack.pop(); render(true); }
+function tab(t){ ui.tab = t; ui.stack = []; render(true); }
+function cur(){ return ui.stack[ui.stack.length - 1] || {view:ui.tab, params:{}}; }
+function render(scrollTop){
+  const phone = $('#phone');
+  if (!st.profile && ui.mode === 'buyer' && cur().view !== 'onb'){ ui.stack = [{view:'onb', params:{}}]; }
+  phone.classList.toggle('wide', ui.mode === 'store');
+  const v = cur();
+  const html = ui.mode === 'store' ? vCabinet() : (VIEWS[v.view] || VIEWS.home)(v.params);
+  $('#screen').innerHTML = html;
+  $('#tabbar').hidden = ui.mode === 'store' || v.view === 'onb';
+  $('#tabbar').innerHTML = [
+    ['home', ICON.home, 'Главная'], ['looks', ICON.hanger, 'Образы'], ['fav', ICON.heart, 'Избранное'], ['profile', ICON.user, 'Профиль']
+  ].map(([k, ic, t]) => {
+    const n = k === 'fav' ? st.fav.length : k === 'profile' ? st.bookings.filter(b => !b.seed && b.status === 'active').length : 0;
+    return `<button data-tab="${k}" class="${ui.tab === k && !ui.stack.length ? 'on' : ''}">${ic}${t}${n ? `<span class="cnt">${n}</span>` : ''}</button>`;
+  }).join('');
+  if (scrollTop) $('#screen').scrollTop = 0;
+  afterRender();
+}
+function afterRender(){
+  document.querySelectorAll('[data-qr]').forEach(el => {
+    el.innerHTML = '';
+    try { new QRCode(el, {text:el.dataset.qr, width:160, height:160, colorDark:'#1E1A17', colorLight:'#FFFFFF'}); }
+    catch(e){ el.textContent = el.dataset.qr; }
+  });
+}
+const backBtn = (title = '') => `<div class="top"><button class="back" data-act="back">${ICON.back}<span>Назад</span></button><div class="grow"></div>${title}</div>`;
+
+/* ================= ЭКРАНЫ ПОКУПАТЕЛЯ ================= */
+function pcard(p, opt = {}){
+  const w = where(p, opt.anySize ? null : undefined);
+  const any = Object.values(st.inv[p.id] || {}).some(m => Object.values(m).some(q => q > 0));
+  const near = where(p)[0];
+  const fav = st.fav.includes(p.id);
+  return `<div class="pcard">
+    <button class="ph" data-act="product" data-id="${p.id}" aria-label="${esc(p.name)}"><img src="img/${p.img}.jpg" alt=""></button>
+    ${p.promo ? '<span class="ad">Реклама</span>' : ''}
+    <button class="heart ${fav ? 'on' : ''}" data-act="fav" data-id="${p.id}" aria-label="В избранное">${ICON.heart}</button>
+    <button data-act="product" data-id="${p.id}" style="text-align:left;display:flex;flex-direction:column;gap:2px">
+      <span class="st">${esc(S(Object.keys(p.stock)[0]).name)}</span>
+      <span class="nm">${esc(p.name)}</span>
+      <span class="pr num">${rub(p.price)}</span>
+      <span class="note">${near ? kmTxt(near.km) + ' · есть ваш размер' : any ? 'нет вашего размера' : 'нет в наличии'}</span>
+    </button>
+  </div>`;
+}
+const VIEWS = {};
+
+VIEWS.onb = () => {
+  const pr = st.profile || {city:'Тюмень', size:'S', shoe:'38', style:'классика', budget:15000};
+  return `<div class="scr">
+    <div class="brand"><img src="img/logo.jpg" alt=""><div><b>Выдрочка</b><small>Стиль, который подойдёт именно тебе</small></div></div>
+    <div class="banner" style="min-height:170px"><div class="txt"><h2>Весь город. На одной полке.</h2><p class="sub" style="color:var(--ink-2)">Собираем образы из вещей, которые прямо сейчас висят в магазинах рядом.</p></div><img src="img/otter.jpg" alt=""></div>
+    <h2 class="h2">Пара вопросов, чтобы не предлагать лишнего</h2>
+    <form id="onbForm" class="col" style="gap:14px">
+      <div class="field"><label for="f-city">Город</label><select id="f-city"><option ${pr.city==='Тюмень'?'selected':''}>Тюмень</option><option ${pr.city==='Курган'?'selected':''}>Курган (скоро)</option></select></div>
+      <div class="field"><label>Размер одежды</label><div class="sizes" data-pick="size">${CLOTH_SIZES.map(s => `<button type="button" class="size ${pr.size===s?'on':''}" data-v="${s}">${s}</button>`).join('')}</div></div>
+      <div class="field"><label>Размер обуви</label><div class="sizes" data-pick="shoe">${SHOE_SIZES.map(s => `<button type="button" class="size ${pr.shoe===s?'on':''}" data-v="${s}">${s}</button>`).join('')}</div></div>
+      <div class="field"><label>Какой стиль ближе</label><div class="quick" data-pick="style">${STYLES.map(s => `<button type="button" class="${pr.style===s?'chip on':'chip'}" data-v="${s}">${s}</button>`).join('')}</div></div>
+      <div class="field"><label for="f-budget">Обычный бюджет на образ, ₽</label><input id="f-budget" type="number" inputmode="numeric" min="1000" step="500" value="${pr.budget}"></div>
+      <label class="check"><input id="f-consent" type="checkbox" ${st.profile ? 'checked' : ''}> Согласна(согласен) на обработку персональных данных: размеры, стиль и примерное местоположение нужны только для подбора. Данные хранятся на серверах в России (152-ФЗ).</label>
+      <button class="btn block" type="submit">${st.profile ? 'Сохранить' : 'Начать подбор'}</button>
+    </form>
+  </div>`;
+};
+
+VIEWS.home = () => {
+  const pr = st.profile;
+  let list = PRODUCTS.filter(p => ui.chip === 'all' || p.cat === ui.chip);
+  if (ui.feat.size) list = list.filter(p => where(p).length);
+  if (ui.feat.style) list = list.filter(p => p.tags.includes(pr.style));
+  list = [...list].sort((a, b) => (b.promo ? 1 : 0) - (a.promo ? 1 : 0) || (where(b).length ? 1 : 0) - (where(a).length ? 1 : 0));
+  const look = ui.lastLook || st.looks[0] || buildLook({budget:pr.budget, tags:[pr.style], tone:null, missing:[]});
+  const nearStores = [...STORES].sort((a, b) => km(a) - km(b)).slice(0, 3);
+  return `<div class="scr">
+    <div class="top">
+      <div class="brand grow"><img src="img/logo.jpg" alt=""><div><b>Выдрочка</b><small>${esc(pr.city)} · размер ${esc(pr.size)} · обувь ${esc(pr.shoe)}</small></div></div>
+      <button class="ibtn" data-tab="fav" aria-label="Избранное">${ICON.heart}</button>
+      <button class="ibtn" data-act="menu" aria-label="Меню">${ICON.menu}</button>
+    </div>
+    <h1 class="h1">Соберём твой образ?</h1>
+    <form class="search" id="searchForm">${ICON.search}<input id="q" placeholder="Найти вещь, бренд или стиль" autocomplete="off"><button type="button" class="ibtn" data-act="stylist" aria-label="ИИ-стилист">${ICON.filter}</button></form>
+    <div class="chips">${[['all','Всё'], ...Object.entries(CATS)].map(([k, t]) => `<button class="chip ${ui.chip===k?'on':''}" data-chip="${k}">${t}</button>`).join('')}</div>
+
+    <div class="banner"><div class="txt"><h2>Твой идеальный образ</h2><p class="sub" style="color:var(--ink-2)">из вещей в магазинах рядом</p><button class="btn sm" data-act="stylist">Создать образ →</button></div><img src="img/otter.jpg" alt=""></div>
+
+    <div class="between"><h2 class="h2">Подборка для тебя</h2><button class="link" data-act="catalog">Смотреть все ›</button></div>
+    <div class="feat">
+      <button class="${ui.feat.size?'on':''}" data-feat="size">${ICON.hanger.replace('<svg','<svg width="18" height="18"')} Подходит по размеру</button>
+      <button class="${ui.feat.style?'on':''}" data-feat="style">${ICON.spark.replace('<svg','<svg width="18" height="18"')} В твоём стиле</button>
+    </div>
+    <div class="hscroll">${list.length ? list.map(p => pcard(p)).join('') : '<p class="sub">По этим фильтрам ничего нет. Снимите один из них.</p>'}</div>
+
+    ${look ? `<div class="lookblock">
+      <div class="model"><h3>Твой образ ${ICON.spark.replace('<svg','<svg width="16" height="16"')}</h3><img src="img/look.jpg" alt="Пример образа на модели"><button class="btn" data-act="openlook" data-id="${look.id}">Посмотреть образ →</button></div>
+      <div class="col">${look.items.map(it => { const p = P(it.pid); return `<button class="mini" data-act="product" data-id="${p.id}"><img src="img/${p.img}.jpg" alt=""><div class="t"><b>${esc(p.name)}</b><span>${esc(S(it.sid).name)}</span><i class="num">${rub(p.price)}</i></div></button>`; }).join('')}</div>
+    </div>` : ''}
+
+    <div class="ai"><div class="txt"><h3>Примерь стиль с ИИ-стилистом</h3><p>Загрузи фото или опиши, что тебе нравится</p><button class="btn sm" style="align-self:flex-start" data-act="stylist">Попробовать →</button></div><img src="img/selfie.jpg" alt=""></div>
+
+    <div class="between"><h2 class="h2">Магазины рядом</h2><button class="link" data-act="map">На карте ›</button></div>
+    <div class="col">${nearStores.map(s => storeRow(s)).join('')}</div>
+  </div>`;
+};
+function storeRow(s, extra = ''){
+  const f = fresh_(s);
+  return `<button class="store" data-act="storepage" data-id="${s.id}"><img src="img/${s.photo}" alt=""><div class="t"><b>${esc(s.name)}</b><span class="sub">${esc(s.branch)} · ${kmTxt(km(s))} · ${s.hours}</span><div style="margin-top:4px"><span class="pill ${f.cls}">${f.t}</span></div></div>${extra}</button>`;
+}
+
+VIEWS.catalog = ({q = ''}) => {
+  const t = q.toLowerCase().trim();
+  const ai = t ? aiState('search' + t) : null;
+  const aiIds = ai?.data && Array.isArray(ai.data.ids) ? ai.data.ids.map(String).filter(P) : null;
+  const list = aiIds ? [...new Set(aiIds)].map(P) : PRODUCTS.filter(p => !t || (p.name + ' ' + CATS[p.cat] + ' ' + p.tags.join(' ') + ' ' + p.tone + ' ' + p.color + ' ' + p.material + ' ' + p.season + ' ' + Object.keys(p.stock).map(id => S(id).name).join(' ')).toLowerCase().includes(t));
+  return `<div class="scr">${backBtn(aiIds ? aiTag : '')}
+    <h1 class="h1">${t ? 'Поиск: ' + esc(q) : 'Все вещи'}</h1>
+    ${ai?.wait ? '<p class="note">ИИ разбирает запрос по смыслу… пока показываем совпадения по словам</p>' : ''}${ai?.err ? `<p class="note">${esc(ai.err)}. Показываем совпадения по словам</p>` : ''}${aiIds && ai.data.note ? `<p class="note">${esc(ai.data.note)}</p>` : ''}
+    <p class="sub">${list.length} ${list.length === 1 ? 'вещь' : 'вещей'} в ${STORES.length} магазинах-партнёрах · ${aiIds ? 'по релевантности' : 'сначала то, что есть в вашем размере'}</p>
+    ${!list.length ? `<div class="empty"><img src="img/otter.jpg" alt=""><b>Пока такого нет ни в одном магазине-партнёре</b><p>Мы записали запрос. Магазины видят, что вы ищете, и могут это завезти. Когда появится — пришлём уведомление.</p><button class="btn" data-act="stylist">Спросить ИИ-стилиста</button></div>` : ''}
+    <div class="grid2">${(aiIds ? list : [...list].sort((a, b) => where(b).length - where(a).length)).map(p => pcard(p)).join('')}</div>
+  </div>`;
+};
+
+VIEWS.product = ({id}) => {
+  const p = P(id); const sz = ui.pickSize?.[id] || sizeFor(p);
+  const stores = Object.keys(st.inv[p.id]);
+  const rows = stores.map(sid => ({s:S(sid), q:qty(p.id, sid, sz), all:st.inv[p.id][sid]})).sort((a, b) => km(a.s) - km(b.s));
+  const fav = st.fav.includes(p.id);
+  return `<div class="scr">${backBtn(`<button class="ibtn heart-top" data-act="fav" data-id="${p.id}" aria-label="В избранное" style="${fav?'background:var(--ink);color:var(--paper)':''}">${ICON.heart}</button>`)}
+    <div class="hero-img"><img src="img/${p.img}.jpg" alt="${esc(p.name)}">${p.promo ? '<span class="ad">Реклама · Trendy · erid: демо</span>' : ''}</div>
+    <div class="col" style="gap:4px">
+      <span class="sub">${CATS[p.cat]} · ${esc(p.color)} · ${esc(p.material)} · ${esc(p.season)} · ${p.tags.map(esc).join(', ')}</span>
+      <h1 class="h1" style="font-size:26px">${esc(p.name)}</h1>
+      <div class="between"><b class="num" style="font-size:24px">${rub(p.price)}</b><span class="pill n">цена как на кассе</span></div>
+    </div>
+    ${p.cat !== 'bag' ? `<div class="field"><label>Размер ${p.cat === 'shoes' ? 'обуви' : ''}</label><div class="sizes">${sizesOf(p).map(s => { const has = stores.some(sid => qty(p.id, sid, s) > 0); return `<button class="size ${s===sz?'on':''} ${has?'':'off'}" data-act="pick" data-id="${p.id}" data-v="${s}">${s}</button>`; }).join('')}</div>
+      ${p.fit ? `<p class="note">Как садится, по отзывам покупателей: <b>${esc(p.fit)}</b></p>` : ''}
+      ${AI ? aiBox('fit' + p.id, `<button class="btn sm ghost" style="align-self:flex-start" data-act="aifit" data-id="${p.id}">${ICON.spark.replace('<svg','<svg width="16" height="16"')} Какой размер мне брать?</button>`) : ''}</div>` : ''}
+    <h2 class="h2">Где есть${p.cat !== 'bag' ? ' размер ' + esc(sz) : ''}</h2>
+    <div class="avail">${rows.map(r => { const f = fresh_(r.s); return `<div class="a">
+      <div><b>${esc(r.s.name)}</b> <span class="sub">· ${esc(r.s.branch)}</span></div>
+      <div class="r">${r.q > 0 ? `<button class="btn sm" data-act="book" data-id="${p.id}" data-sid="${r.s.id}" data-sz="${esc(sz)}">Забронировать</button>` : '<span class="pill bad">нет размера</span>'}</div>
+      <div class="sub">${kmTxt(km(r.s))} · ${walk(km(r.s))} · ${r.q > 0 ? (r.q === 1 ? 'последняя штука' : r.q + ' шт.') : 'есть: ' + Object.entries(r.all).filter(([, q]) => q > 0).map(([s]) => s).join(', ')}</div>
+      <div style="grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><span class="pill ${f.cls}">${f.t}</span><button class="link" style="font-size:12px" data-act="report" data-sid="${r.s.id}" data-id="${p.id}">Вещи не оказалось?</button></div>
+    </div>`; }).join('')}</div>
+    <p class="note">Бронь держится 24 часа и бесплатна. Оплата — в магазине после примерки. Не подошло — просто не покупайте.</p>
+    ${SC && cobuyFor(p.id).length ? `<h2 class="h2">С этим берут</h2><div class="grid2">${cobuyFor(p.id).slice(0, 2).map(x => pcard(x)).join('')}</div><p class="note">По 734 тыс. корзин H&M: модель item2vec, вещи из других категорий, которые есть в наличии.</p>` : ''}
+    <button class="btn ghost block" data-act="stylistWith" data-id="${p.id}">${ICON.spark.replace('<svg','<svg width="18" height="18"')} Собрать образ с этой вещью</button>
+  </div>`;
+};
+
+VIEWS.stylist = () => {
+  const pr = st.profile;
+  const chat = ui.chat.length ? ui.chat : [{me:false, html:`Привет! Я подберу образ только из вещей, которые сейчас есть в магазинах ${esc(pr.city)} в вашем размере (${esc(pr.size)}, обувь ${esc(pr.shoe)}). Напишите, куда и за сколько.`}];
+  return `<div class="scr">${backBtn(AI ? aiTag : '<span class="pill n">ИИ-стилист · правила</span>')}
+    <h1 class="h1">Опиши, что нужно</h1>
+    <div class="col" style="gap:10px">${chat.map(m => `<div class="msg ${m.me ? 'me' : ''}">${m.html}</div>`).join('')}</div>
+    <div class="quick">${['Образ на учёбу до 15 000 ₽', 'В офис, тёмные цвета', 'На свидание до 25 000', 'Повседневный до 5 000 ₽', 'Хочу платье миди'].map(t => `<button data-act="ask" data-q="${esc(t)}">${esc(t)}</button>`).join('')}</div>
+    <form id="askForm" class="search">${ICON.spark}<input id="ask" placeholder="Например: на учёбу, светлое, до 10 000" autocomplete="off"><button class="btn sm" type="submit">Собрать</button></form>
+    <label class="btn ghost block" for="photo" style="cursor:pointer">Загрузить фото образа-примера</label>
+    <input id="photo" type="file" accept="image/*" hidden>
+    <p class="note">${AI ? 'Запрос разбирает наша модель, фото — наша нейросеть, сочетаемость вещей — модель, обученная на образах Polyvore. Все модели работают прямо в телефоне, без внешних сервисов. Выбор — только из реальных остатков в вашем размере.' : 'Модели ещё загружаются или не загрузились, поэтому стилист работает по правилам: понимает повод, бюджет и цвет и выбирает только из каталога.'}</p>
+  </div>`;
+};
+
+VIEWS.look = ({id}) => {
+  const look = st.looks.find(l => l.id === id) || (ui.lastLook && ui.lastLook.id === id ? ui.lastLook : null);
+  if (!look) return VIEWS.looks();
+  const r = routeOrder(look.items.map(i => i.sid));
+  const saved = st.looks.some(l => l.id === look.id);
+  const left = look.q.budget ? look.q.budget - look.total : null;
+  return `<div class="scr">${backBtn(saved ? '<span class="pill ok">сохранён</span>' : '')}
+    <span class="sub">${esc(look.title || 'Образ')}</span>
+    <h1 class="h1">Твой образ из ${r.stores.length} ${r.stores.length === 1 ? 'магазина' : 'магазинов'}</h1>
+    ${look.ai?.reply ? `<div class="msg" style="max-width:100%">${aiTag} ${esc(look.ai.reply)}</div>` : ''}
+    <div class="col">${look.items.map((it, i) => { const p = P(it.pid), s = S(it.sid), why = look.ai?.why?.[p.id]; return `<div class="litem">
+      <button data-act="product" data-id="${p.id}"><img src="img/${p.img}.jpg" alt=""></button>
+      <div class="t"><span class="sub">${CATS[p.cat]}</span><b>${esc(p.name)}</b>${why ? `<span class="sub"><i>${esc(why)}</i></span>` : ''}<span class="sub">${esc(s.name)} · ${esc(s.branch)} · ${kmTxt(km(s))}</span><b class="num">${rub(p.price)}</b></div>
+      <div class="act"><span class="pill ${qty(p.id, s.id, it.sz) > 1 ? 'ok' : 'warn'}">${it.sz === 'one' ? 'в наличии' : 'размер ' + esc(it.sz)}</span><button class="btn sm ghost" data-act="swap" data-id="${look.id}" data-i="${i}">Заменить</button></div>
+    </div>`; }).join('')}</div>
+    ${look.items.length < 4 ? `<p class="note">${look.items.some(i => P(i.pid).cat === 'shoes') ? '' : 'Обувь в этот бюджет не поместилась. '}${look.items.some(i => P(i.pid).cat === 'bag') ? '' : 'Сумку можно добавить, если поднять бюджет.'}</p>` : ''}
+    <div class="sum">
+      <div class="between"><span>Итого</span><b class="num" style="font-size:22px">${rub(look.total)}</b></div>
+      ${left !== null ? `<div class="between"><span>Бюджет ${rub(look.q.budget)}</span><span class="num">остаётся ${rub(left)}</span></div>` : ''}
+      <div class="between"><span>Маршрут</span><span>${r.stores.map(s => esc(s.name)).join(' → ')} · ${kmTxt(r.dist)}</span></div>
+      <button class="btn block" data-act="bookall" data-id="${look.id}">Забронировать всё на 24 часа</button>
+    </div>
+    <div class="row">${saved ? '' : `<button class="btn ghost" style="flex:1" data-act="savelook" data-id="${look.id}">Сохранить образ</button>`}<button class="btn ghost" style="flex:1" data-act="route" data-id="${look.id}">${ICON.pin} Маршрут</button></div>
+  </div>`;
+};
+
+function mapSvg(stores, path){
+  const pts = path ? [ME, ...path] : null;
+  return `<div class="map"><svg viewBox="0 0 100 80" role="img" aria-label="Схема магазинов рядом">
+    <rect width="100" height="80" fill="#E3DBD2"/>
+    <path d="M-5 70 C 20 60, 30 78, 55 70 S 90 58, 105 66 L105 85 L-5 85Z" fill="#CFC7BD"/>
+    <text x="78" y="75" font-size="3" fill="#857B74" font-family="Manrope,Arial">р. Тура</text>
+    ${[[0,40,100,40],[0,22,100,28],[30,0,34,80],[55,0,52,70],[78,0,82,62],[0,58,100,52]].map(l => `<line x1="${l[0]}" y1="${l[1]}" x2="${l[2]}" y2="${l[3]}" stroke="#F2ECE6" stroke-width="2.2"/>`).join('')}
+    ${pts ? `<polyline points="${pts.map(p => p.x + ',' + p.y).join(' ')}" fill="none" stroke="#1E1A17" stroke-width=".8" stroke-dasharray="1.6 1.2"/>` : ''}
+    ${stores.map((s, i) => `<g><circle cx="${s.x}" cy="${s.y}" r="2.8" fill="#1E1A17"/>${path ? `<text x="${s.x}" y="${s.y + 1}" font-size="2.8" text-anchor="middle" fill="#F7F3EF" font-weight="700" font-family="Manrope,Arial">${path.indexOf(s) + 1}</text>` : ''}<text x="${s.x}" y="${s.y - 4}" font-size="3" text-anchor="middle" fill="#1E1A17" font-weight="700" font-family="Manrope,Arial">${esc(s.name)}</text></g>`).join('')}
+    <circle cx="${ME.x}" cy="${ME.y}" r="4" fill="#1E1A17" opacity=".15"/><circle cx="${ME.x}" cy="${ME.y}" r="1.8" fill="#3D7A57" stroke="#fff" stroke-width=".6"/>
+    <text x="${ME.x}" y="${ME.y + 6.5}" font-size="3" text-anchor="middle" fill="#3D7A57" font-weight="700" font-family="Manrope,Arial">вы здесь</text>
+  </svg></div>`;
+}
+VIEWS.route = ({id}) => {
+  const look = st.looks.find(l => l.id === id) || ui.lastLook;
+  const r = routeOrder(look.items.map(i => i.sid));
+  return `<div class="scr">${backBtn()}
+    <h1 class="h1">Маршрут на примерку</h1>
+    <p class="sub">${r.stores.length} ${r.stores.length === 1 ? 'точка' : 'точки'} · ${kmTxt(r.dist)} · около ${Math.round(r.dist * 13 + r.stores.length * 15)} мин с примеркой</p>
+    ${mapSvg(r.stores, r.stores)}
+    <div class="col">${r.stores.map((s, i) => storeRow(s, `<span class="pill n">${i + 1}</span>`)).join('')}</div>
+    <p class="note">Схема условная. В рабочей версии маршрут открывается в 2ГИС или Яндекс Картах.</p>
+  </div>`;
+};
+VIEWS.map = () => `<div class="scr">${backBtn()}<h1 class="h1">Магазины-партнёры</h1><p class="sub">${STORES.length} магазинов в Тюмени, данные о наличии приходят из их учётных систем</p>${mapSvg(STORES)}<div class="col">${[...STORES].sort((a, b) => km(a) - km(b)).map(s => storeRow(s)).join('')}</div></div>`;
+VIEWS.storepage = ({id}) => {
+  const s = S(id), f = fresh_(s);
+  const items = PRODUCTS.filter(p => st.inv[p.id][id]);
+  stat(id, 'views'); save();
+  return `<div class="scr">${backBtn()}
+    <img src="img/${s.photo}" alt="" style="border-radius:var(--r-xl);aspect-ratio:16/9;object-fit:cover;width:100%">
+    <h1 class="h1">${esc(s.name)}</h1>
+    <p class="sub">${esc(s.branch)} · ${kmTxt(km(s))} · ${s.hours}</p>
+    <div class="row" style="flex-wrap:wrap"><span class="pill ${f.cls}">${f.t}</span><span class="pill n">наличие из: ${esc(s.sync)}</span>${st.reports[id] ? `<span class="pill warn">жалоб на наличие: ${st.reports[id]}</span>` : ''}</div>
+    <h2 class="h2">Сейчас в магазине</h2>
+    <div class="grid2">${items.map(p => pcard(p)).join('')}</div>
+  </div>`;
+};
+
+VIEWS.booking = ({ids}) => {
+  const bs = st.bookings.filter(b => ids.includes(b.id));
+  return `<div class="scr">${backBtn()}
+    <h1 class="h1">Забронировано</h1>
+    <p class="sub">Покажите QR-код или назовите код на кассе. Бронь действует 24 часа: до ${new Date(bs[0].created + 24 * 3600e3).toLocaleString('ru-RU', {day:'numeric', month:'long', hour:'2-digit', minute:'2-digit'})}.</p>
+    ${bs.map(b => { const p = P(b.pid), s = S(b.sid); return `<div class="qrbox">
+      <div class="qr" data-qr="https://vydrochka.ru/b/${b.code.replace('ВД-', 'VD')}"></div>
+      <div class="code num">${b.code}</div>
+      <b>${esc(p.name)}${b.sz !== 'one' ? ', размер ' + esc(b.sz) : ''}</b>
+      <span class="sub">${esc(s.name)} · ${esc(s.branch)} · ${s.hours}</span>
+    </div>`; }).join('')}
+    <button class="btn block" data-tab="profile">Мои брони</button>
+  </div>`;
+};
+
+VIEWS.looks = () => `<div class="scr">
+  <div class="between"><h1 class="h1">Образы</h1><button class="btn sm" data-act="stylist">+ Новый</button></div>
+  ${st.looks.length ? st.looks.map(l => `<button class="panel" style="text-align:left" data-act="openlook" data-id="${l.id}">
+    <div class="between"><b>${esc(l.title || 'Образ')}</b><b class="num">${rub(l.total)}</b></div>
+    <div class="row">${l.items.map(it => `<img src="img/${P(it.pid).img}.jpg" alt="" style="width:56px;height:56px;object-fit:contain;background:var(--white);border-radius:12px">`).join('')}</div>
+    <span class="sub">${[...new Set(l.items.map(i => S(i.sid).name))].join(', ')}</span></button>`).join('')
+  : `<div class="empty"><img src="img/otter.jpg" alt=""><b>Здесь будут сохранённые образы</b><p>Попросите ИИ-стилиста собрать образ и нажмите «Сохранить».</p><button class="btn" data-act="stylist">Создать образ</button></div>`}
+</div>`;
+VIEWS.fav = () => {
+  const list = st.fav.map(P);
+  return `<div class="scr"><h1 class="h1">Избранное</h1>
+  ${list.length ? `<div class="grid2">${list.map(p => pcard(p)).join('')}</div><button class="btn ghost block" data-act="stylist">Собрать образ из избранного</button>` : `<div class="empty"><img src="img/otter.jpg" alt=""><b>Пока пусто</b><p>Нажимайте на сердечко у вещей, и мы сообщим, если размер закончится.</p></div>`}</div>`;
+};
+VIEWS.profile = () => {
+  const mine = st.bookings.filter(b => !b.seed);
+  const pr = st.profile;
+  const stLabel = {active:['ok','действует'], done:['n','выдано'], cancel:['bad','отменена']};
+  return `<div class="scr"><h1 class="h1">Профиль</h1>
+    <div class="panel"><div class="between"><b>Мои параметры</b><button class="link" data-act="editprofile">Изменить</button></div>
+      <span class="sub">${esc(pr.city)} · одежда ${esc(pr.size)} · обувь ${esc(pr.shoe)} · стиль «${esc(pr.style)}» · бюджет до ${rub(+pr.budget)}</span></div>
+    <h2 class="h2">Мои брони</h2>
+    ${mine.length ? mine.slice().reverse().map(b => { const p = P(b.pid), s = S(b.sid), [c, t] = stLabel[b.status]; return `<div class="litem">
+      <img src="img/${p.img}.jpg" alt=""><div class="t"><b>${esc(p.name)}</b><span class="sub">${esc(s.name)} · ${esc(s.branch)}</span><span class="num" style="font-weight:800">${b.code}</span></div>
+      <div class="act"><span class="pill ${c}">${t}</span>${b.status === 'active' ? `<button class="btn sm ghost" data-act="showbk" data-id="${b.id}">QR</button><button class="link" style="font-size:12px" data-act="cancelbk" data-id="${b.id}">Отменить</button>` : ''}</div></div>`; }).join('')
+    : '<p class="sub">Броней пока нет.</p>'}
+    <h2 class="h2">Для бизнеса</h2>
+    <button class="store" data-act="tostore"><img src="img/store2.jpg" alt=""><div class="t"><b>Кабинет магазина</b><span class="sub">Каталог, остатки, брони, спрос в городе</span></div></button>
+    <a class="btn ghost block" href="docs.html" target="_blank" rel="noopener">О проекте и документация</a>
+  </div>`;
+};
+
+/* ================= КАБИНЕТ МАГАЗИНА ================= */
+function storeStats(sid){
+  const live = st.stats[sid] || {};
+  const bk = st.bookings.filter(b => b.sid === sid);
+  return {views:SEED_STATS.views + (live.views || 0), cards:SEED_STATS.cards + (live.cards || 0), routes:SEED_STATS.routes + (live.routes || 0),
+    bookings:SEED_STATS.bookings + bk.filter(b => !b.seed).length, visits:SEED_STATS.visits + bk.filter(b => !b.seed && b.status === 'done').length};
+}
+function vCabinet(){
+  const sid = ui.cabStore, s = S(sid);
+  const tabs = [['sum','Сводка'],['bk','Брони'],['inv','Товары и остатки'],['demand','Спрос в городе'],['plan','Тариф и API']];
+  return `<div class="cab">
+    <nav>
+      <div class="brand"><img src="img/logo.jpg" alt=""><div><b>Выдрочка</b><small style="color:rgba(247,243,239,.6)">кабинет магазина</small></div></div>
+      <label class="sub" for="cabStore" style="color:rgba(247,243,239,.6);margin-top:8px">Магазин</label>
+      <select id="cabStore">${STORES.map(x => `<option value="${x.id}" ${x.id === sid ? 'selected' : ''}>${esc(x.name)} · ${esc(x.branch)}</option>`).join('')}</select>
+      ${tabs.map(([k, t]) => `<button class="${ui.cabTab === k ? 'on' : ''}" data-cab="${k}">${t}</button>`).join('')}
+      <div class="sp"></div>
+      <button data-act="tobuyer">← Приложение покупателя</button>
+    </nav>
+    <main>${CAB[ui.cabTab](s)}</main>
+  </div>`;
+}
+const CAB = {};
+CAB.sum = s => {
+  const k = storeStats(s.id), f = fresh_(s);
+  const fun = [['Показы в подборках', k.views], ['Открыли карточку', k.cards], ['Построили маршрут', k.routes], ['Забронировали', k.bookings], ['Пришли и купили', k.visits]];
+  return `<div class="between" style="flex-wrap:wrap"><div><h1 class="h1" style="font-size:26px">${esc(s.name)} · ${esc(s.branch)}</h1><p class="sub">Последние 30 дней · <span class="demo">демо-данные</span></p></div><span class="pill ${f.cls}">${esc(s.sync)}: ${f.t}</span></div>
+    <div class="kpis">
+      <div class="kpi"><span>Покупателей пришло</span><b class="num">${k.visits}</b><span>подтверждено кодом</span></div>
+      <div class="kpi"><span>Конверсия брони в визит</span><b class="num">${Math.round(k.visits / k.bookings * 100)}%</b><span>${k.visits} из ${k.bookings}</span></div>
+      <div class="kpi"><span>Продано через приложение</span><b class="num">${rub(k.visits * 5400)}</b><span>средний чек 5 400 ₽</span></div>
+      <div class="kpi"><span>Стоимость визита</span><b class="num">0 ₽</b><span>пилот бесплатный</span></div>
+    </div>
+    <div class="panel"><b>Путь покупателя до кассы</b><div class="funnel">${fun.map(([t, v]) => `<div class="fbar"><span>${t}</span><div class="tr"><i style="width:${Math.max(3, v / k.views * 100)}%"></i></div><b class="num">${v}</b></div>`).join('')}</div></div>
+    <div class="cols2">
+      <div class="panel"><b>Что можно улучшить</b><ul style="margin:0;padding-left:18px;font-size:13px;color:var(--ink-2);display:flex;flex-direction:column;gap:6px">
+        <li>Размер M пиджака заканчивается: осталась ${qty('p4', s.id, 'M') || 0} шт.</li><li>${f.cls === 'warn' ? 'Остатки давно не обновлялись. Подключите кассу или загрузите свежий файл.' : 'Остатки обновляются автоматически, всё в порядке.'}</li>
+        <li>В городе ищут платья миди (23 запроса), а их нет ни у одного партнёра.</li></ul></div>
+      <div class="panel"><b>Жалобы «вещи не оказалось»</b><b class="num" style="font-size:28px">${st.reports[s.id] || 0}</b><span class="sub">Если жалоб больше трёх за неделю, магазин опускается в выдаче, пока не обновит остатки.</span></div>
+    </div>`;
+};
+CAB.bk = s => {
+  const bk = st.bookings.filter(b => b.sid === s.id).slice().reverse();
+  const lbl = {active:['ok','ждёт покупателя'], done:['n','выдано'], cancel:['bad','отменена']};
+  return `<h1 class="h1" style="font-size:26px">Брони</h1>
+    <form id="issueForm" class="panel"><b>Выдать бронь</b><span class="sub">Отсканируйте QR-код покупателя или введите код. Так магазин и сервис узнают, что покупатель пришёл.</span>
+      <div class="row" style="flex-wrap:wrap"><input id="issueCode" class="field" style="height:48px;border-radius:var(--r-m);border:1px solid var(--line);padding:0 14px;flex:1;min-width:160px;background:var(--white)" placeholder="ВД-0000" autocomplete="off"><button class="btn" type="submit">Подтвердить визит</button></div></form>
+    <div class="tbl"><table><thead><tr><th>Код</th><th>Вещь</th><th>Размер</th><th>Создана</th><th>Статус</th><th></th></tr></thead><tbody>
+    ${bk.length ? bk.map(b => { const [c, t] = lbl[b.status]; return `<tr><td class="num"><b>${b.code}</b>${b.seed ? ' <span class="demo">пример</span>' : ''}</td><td>${esc(P(b.pid).name)}</td><td>${b.sz === 'one' ? '—' : esc(b.sz)}</td><td class="num">${new Date(b.created).toLocaleString('ru-RU', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'})}</td><td><span class="pill ${c}">${t}</span></td><td>${b.status === 'active' ? `<button class="btn sm" data-act="issue" data-id="${b.id}">Выдать</button>` : ''}</td></tr>`; }).join('') : '<tr><td colspan="6">Броней нет. Забронируйте вещь этого магазина в приложении покупателя, и она появится здесь.</td></tr>'}
+    </tbody></table></div>`;
+};
+CAB.inv = s => {
+  const items = PRODUCTS.filter(p => st.inv[p.id][s.id]);
+  return `<div class="between" style="flex-wrap:wrap"><h1 class="h1" style="font-size:26px">Товары и остатки</h1><span class="pill ${fresh_(s).cls}">источник: ${esc(s.sync)}</span></div>
+    <div class="tbl"><table><thead><tr><th>Товар</th><th>Цена</th>${[...CLOTH_SIZES, ...SHOE_SIZES, 'one'].filter(z => items.some(p => sizesOf(p).includes(z))).map(z => `<th>${z === 'one' ? 'шт.' : z}</th>`).join('')}</tr></thead><tbody>
+    ${items.map(p => `<tr><td><b>${esc(p.name)}</b></td><td class="num">${rub(p.price)}</td>${[...CLOTH_SIZES, ...SHOE_SIZES, 'one'].filter(z => items.some(pp => sizesOf(pp).includes(z))).map(z => sizesOf(p).includes(z) ? `<td><input class="q num" type="number" min="0" value="${qty(p.id, s.id, z)}" data-inv="${p.id}|${s.id}|${z}" aria-label="${esc(p.name)} ${z}"></td>` : '<td></td>').join('')}</tr>`).join('')}
+    </tbody></table></div>
+    <div class="cols2">
+      <div class="panel"><b>Как подключить остатки</b><ul style="margin:0;padding-left:18px;font-size:13px;color:var(--ink-2);display:flex;flex-direction:column;gap:6px">
+        <li><b>1С:Розница или МойСклад</b> — модуль выгрузки, остатки обновляются каждые 15 минут.</li>
+        <li><b>Эвотор</b> — приложение из их маркета, продажи сразу списывают остаток.</li>
+        <li><b>Нет учётной системы</b> — Excel- или CSV-файл раз в день, либо правка прямо в этой таблице.</li></ul></div>
+      <form class="panel" id="csvForm"><b>Загрузить файл с остатками</b><span class="sub">Формат строки: название;размер;количество</span>
+        <pre class="json">Пиджак оверсайз;M;3
+Брюки широкие;S;1</pre>
+        <label class="btn ghost" for="csv" style="cursor:pointer">Выбрать CSV-файл</label><input id="csv" type="file" accept=".csv,text/csv,text/plain" hidden></form>
+    </div>
+    ${AI && AI_IMG ? cardPanel() : ''}`;
+};
+function cardPanel(){
+  const a = aiState('card'), d = a?.data;
+  return `<div class="panel"><div class="between" style="flex-wrap:wrap"><b>Карточка товара по фото</b>${aiTag}</div>
+    <span class="sub">Сфотографируйте вещь — ИИ заполнит название, категорию, цвет, сезон, теги и описание по схеме датасета Fashion Product Images.</span>
+    ${a?.wait ? '<p class="note">ИИ рассматривает фото…</p>' : ''}${a?.err ? `<p class="note">${esc(a.err)}</p>` : ''}
+    ${d ? `<div class="tbl"><table><tbody>${[['Название', d.name], ['Категория', CATS[d.cat] || d.cat], ['Тип', d.articleType], ['Цвет', d.color], ['Материал', d.material], ['Сезон', d.season], ['Теги', Array.isArray(d.tags) ? d.tags.join(', ') : d.tags], ['Цена', d.price_from ? `${rub(+d.price_from)} – ${rub(+d.price_to || +d.price_from)}` : ''], ['Описание', d.description]].filter(([, v]) => v).map(([k, v]) => `<tr><td class="sub">${k}</td><td>${esc(v)}</td></tr>`).join('')}</tbody></table></div><p class="note">Проверьте поля перед публикацией: в рабочей версии карточка уходит в каталог после подтверждения магазином.</p>` : ''}
+    ${a?.wait ? '' : `<label class="btn ghost" for="cardPhoto" style="cursor:pointer;align-self:flex-start">${d ? 'Другое фото' : 'Загрузить фото товара'}</label>`}<input id="cardPhoto" type="file" accept="image/jpeg,image/png,image/webp" hidden></div>`;
+}
+CAB.demand = () => {
+  const all = [...st.demand.map(d => ({...d, live:true})), ...SEED_DEMAND];
+  const max = Math.max(...all.map(d => d.n));
+  return `<h1 class="h1" style="font-size:26px">Что ищут в Тюмени и не находят</h1>
+    <p class="sub">Запросы покупателей, на которые ни у одного магазина-партнёра не нашлось вещей. Это подсказка, что завезти.</p>
+    <div class="panel"><div class="funnel">${all.map(d => `<div class="fbar"><span style="white-space:normal">${esc(d.q)}${d.live ? ' <span class="pill ok">новый</span>' : ''}</span><div class="tr"><i style="width:${Math.max(4, d.n / max * 100)}%"></i></div><b class="num">${d.n}</b></div>`).join('')}</div></div>
+    ${AI ? `<div class="panel"><div class="between" style="flex-wrap:wrap"><b>Что завезти: разбор от ИИ</b>${aiTag}</div><span class="sub">Сопоставляем ненайденные запросы, остатки магазина и то, что покупают вместе (модель по корзинам H&M).</span>${aiBox('demand')}${aiState('demand')?.wait ? '' : `<button class="btn sm" style="align-self:flex-start" data-act="aidemand">${aiState('demand') ? 'Разобрать заново' : 'Получить рекомендации'}</button>`}</div>` : ''}
+    <p class="note">Данные обезличены: магазин видит только формулировку запроса и сколько раз его задавали, но не видит, кто спрашивал. Подробный отчёт по району и сезону входит в платный тариф.</p>`;
+};
+CAB.plan = s => `<h1 class="h1" style="font-size:26px">Тариф и API</h1>
+  <div class="tariffs">
+    <div class="tariff cur"><span class="pill ok">подключён</span><b class="h2">Пилот</b><b class="num">0 ₽ · 3 месяца</b><ul><li>каталог и остатки</li><li>брони и выдача по коду</li><li>базовая статистика</li></ul></div>
+    <div class="tariff"><span class="pill n">после пилота</span><b class="h2">Старт</b><b class="num">1 990 ₽/мес + 49 ₽ за визит</b><ul><li>всё из пилота</li><li>платим только за подтверждённых покупателей</li><li>отчёт «что ищут в городе»</li></ul></div>
+    <div class="tariff"><span class="pill n">сети</span><b class="h2">Сеть</b><b class="num">от 9 900 ₽/мес</b><ul><li>несколько точек</li><li>интеграция с 1С</li><li>продвижение с пометкой «Реклама»</li></ul></div>
+  </div>
+  <p class="note">Цены — гипотеза. На пилоте проверяем, готовы ли магазины платить за визит, и только потом фиксируем тариф.</p>
+  <div class="panel"><b>Этап 3: наличие для ИИ-ассистентов</b><span class="sub">Через тот же поток данных магазин виден не только в нашем приложении, но и голосовым помощникам, картам и чат-ботам. Ответ сервиса выглядит так:</span>
+  <pre class="json">GET /v1/availability?city=tyumen&amp;q=пиджак&amp;size=M
+
+{
+  "items": [{
+    "product": "Пиджак оверсайз",
+    "price": 7990,
+    "store": "${esc(s.name)}, ${esc(s.branch)}",
+    "size": "M",
+    "qty": ${qty('p4', 'stil1', 'M')},
+    "updated_min_ago": ${s.upd},
+    "reserve_url": "https://vydrochka.ru/r/p4"
+  }]
+}</pre><span class="note">Адрес и формат условные, в прототипе запрос не выполняется.</span></div>`;
+
+/* ================= ДЕЙСТВИЯ ================= */
+function askStylist(text, q = parseQuery(text), silent = false){
+  ui.chat = ui.chat.length ? ui.chat : [];
+  if (!silent) ui.chat.push({me:true, html:esc(text)});
+  if (q.note) ui.chat.push({me:false, html:`<span class="sub">${esc(q.note)}</span>`});
+  if (q.missing.length){
+    q.missing.forEach(m => { const ex = st.demand.find(d => d.q === m); ex ? ex.n++ : st.demand.unshift({q:m, n:1}); });
+    ui.chat.push({me:false, html:`Пока ни у одного магазина-партнёра нет: <b>${q.missing.join(', ')}</b>. Я записал запрос: магазины видят, что это ищут, и сообщат, когда завезут.${q.tags.length || q.budget ? ' А пока собрал то, что есть:' : ''}`});
+    if (!q.tags.length && !q.budget){ save(); render(); return; }
+  }
+  if (!q.budget) q.budget = +st.profile.budget || null;
+  if (!q.tags.length) q.tags = [st.profile.style];
+  const look = buildLook(q, ui.withItem ? {[P(ui.withItem).cat]:ui.withItem} : {});
+  ui.withItem = null;
+  if (!look){
+    ui.chat.push({me:false, html:`В бюджет ${rub(q.budget)} целый образ (верх и низ) в вашем размере не собирается. Самый дешёвый комплект стоит от ${rub(1990 + 2290)}. Попробуйте поднять бюджет.`});
+    save(); render(); return;
+  }
+  look.title = text;
+  if (SC) look.ai = lookExplain(look);
+  ui.lastLook = look;
+  ui.chat.push({me:false, html:`Готово: ${look.items.length} ${look.items.length === 4 ? 'вещи' : 'вещи'} на ${rub(look.total)} из ${new Set(look.items.map(i => i.sid)).size} магазинов. <button class="link" data-act="openlook" data-id="${look.id}" style="text-decoration:underline">Открыть образ →</button>`});
+  look.items.forEach(i => stat(i.sid, 'views'));
+  save(); go('look', {id:look.id});
+}
+function book(pid, sid, sz){
+  const left = qty(pid, sid, sz); if (left < 1){ toast('Этот размер уже забрали'); return null; }
+  st.inv[pid][sid][sz] = left - 1;
+  const b = {id:'b' + Date.now() + Math.random().toString(36).slice(2, 5), code:'ВД-' + (1000 + Math.floor(Math.random() * 9000)), pid, sid, sz, created:Date.now(), status:'active'};
+  st.bookings.push(b); stat(sid, 'routes'); return b;
+}
+function findLook(id){ return st.looks.find(l => l.id === id) || (ui.lastLook?.id === id ? ui.lastLook : null); }
+
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-act],[data-tab],[data-chip],[data-feat],[data-cab],[data-go],[data-pick] button');
+  if (!t) return;
+  if (t.matches('[data-pick] button')){
+    const box = t.parentElement; box.querySelectorAll('button').forEach(b => b.classList.remove('on')); t.classList.add('on');
+    if (box.dataset.pick === 'style') box.querySelectorAll('button').forEach(b => b.className = b === t ? 'chip on' : 'chip');
+    return;
+  }
+  if (t.dataset.tab){ ui.mode = 'buyer'; tab(t.dataset.tab); return; }
+  if (t.dataset.chip){ ui.chip = t.dataset.chip; render(); return; }
+  if (t.dataset.feat){ ui.feat[t.dataset.feat] = !ui.feat[t.dataset.feat]; render(); return; }
+  if (t.dataset.cab){ ui.cabTab = t.dataset.cab; render(true); return; }
+  if (t.dataset.go) return guideGo(t.dataset.go);
+  const id = t.dataset.id, a = t.dataset.act;
+  switch (a){
+    case 'back': back(); break;
+    case 'menu': tab('profile'); break;
+    case 'product': { const p = P(id); stat(Object.keys(p.stock)[0], 'cards'); save(); go('product', {id}); break; }
+    case 'fav': st.fav = st.fav.includes(id) ? st.fav.filter(x => x !== id) : [...st.fav, id]; save(); toast(st.fav.includes(id) ? 'Добавили в избранное. Сообщим, если размер закончится' : 'Убрали из избранного'); render(); break;
+    case 'pick': ui.pickSize = {...(ui.pickSize || {}), [id]:t.dataset.v}; render(); break;
+    case 'stylist': ui.chat = []; go('stylist'); break;
+    case 'stylistWith': ui.chat = []; ui.withItem = id; go('stylist'); toast('Стилист соберёт образ вокруг этой вещи'); break;
+    case 'ask': AI ? askStylistAI(t.dataset.q) : askStylist(t.dataset.q); break;
+    case 'aifit': if (AI) aiRun('fit' + id, () => AI_TASKS.fit(id)); break;
+    case 'aidemand': if (AI) aiRun('demand', () => AI_TASKS.demand(S(ui.cabStore))); break;
+    case 'catalog': go('catalog', {}); break;
+    case 'map': go('map'); break;
+    case 'storepage': go('storepage', {id}); break;
+    case 'openlook': if (findLook(id)) go('look', {id}); else { ui.lastLook = buildLook({budget:+st.profile.budget, tags:[st.profile.style], tone:null, missing:[]}); ui.lastLook.title = 'Подборка по анкете'; go('look', {id:ui.lastLook.id}); } break;
+    case 'swap': {
+      const look = findLook(id), i = +t.dataset.i, it = look.items[i], cat = P(it.pid).cat;
+      const lock = {}; look.items.forEach((x, j) => { if (j !== i) lock[P(x.pid).cat] = x.pid; });
+      const skip = [...(look.skip || []), it.pid];
+      const ok = l => l && l.items.find(x => P(x.pid).cat === cat);
+      const cats = look.items.map(x => P(x.pid).cat);
+      const sk = [...skip.filter(s => P(s).cat === cat), ...PRODUCTS.filter(p => !cats.includes(p.cat)).map(p => p.id)];
+      let nl = buildLook(look.q, lock, sk), over = false;
+      if (!ok(nl)){ nl = buildLook({...look.q, budget:null}, lock, sk); over = true; }
+      if (!ok(nl)){ toast('Других вариантов в вашем размере нет. Начинаем список заново'); look.skip = []; break; }
+      look.items = nl.items; look.total = nl.total; look.skip = skip; save(); render();
+      toast(over && look.q.budget && nl.total > look.q.budget ? `Заменили, но образ вышел дороже бюджета на ${rub(nl.total - look.q.budget)}` : 'Заменили. Остальные вещи оставили как были'); break;
+    }
+    case 'savelook': { const look = findLook(id); if (!st.looks.some(l => l.id === id)) st.looks.unshift(look); save(); toast('Образ сохранён во вкладке «Образы»'); render(); break; }
+    case 'route': findLook(id).items.forEach(i => stat(i.sid, 'routes')); save(); go('route', {id}); break;
+    case 'book': { const b = book(id, t.dataset.sid, t.dataset.sz); if (b){ save(); go('booking', {ids:[b.id]}); } break; }
+    case 'bookall': {
+      const look = findLook(id); const ids = [];
+      look.items.forEach(it => { const b = book(it.pid, it.sid, it.sz); if (b) ids.push(b.id); });
+      if (!st.looks.some(l => l.id === id)) st.looks.unshift(look);
+      save(); if (ids.length) go('booking', {ids}); break;
+    }
+    case 'showbk': go('booking', {ids:[id]}); break;
+    case 'cancelbk': { const b = st.bookings.find(x => x.id === id); b.status = 'cancel'; st.inv[b.pid][b.sid][b.sz]++; save(); toast('Бронь отменена, вещь вернулась в продажу'); render(); break; }
+    case 'report': st.reports[t.dataset.sid] = (st.reports[t.dataset.sid] || 0) + 1; save(); toast('Спасибо! Передали магазину, проверим остатки'); render(); break;
+    case 'editprofile': go('onb'); break;
+    case 'tostore': ui.mode = 'store'; render(true); break;
+    case 'tobuyer': ui.mode = 'buyer'; render(true); break;
+    case 'issue': issue(st.bookings.find(b => b.id === id)); break;
+  }
+});
+function issue(b){
+  if (!b || b.status !== 'active'){ toast('Такой действующей брони нет'); return; }
+  b.status = 'done'; save(); toast(`Визит подтверждён: ${b.code}. Покупатель пришёл через Выдрочку`); render();
+}
+document.addEventListener('submit', e => {
+  e.preventDefault();
+  const f = e.target;
+  if (f.id === 'onbForm'){
+    if (!$('#f-consent').checked){ toast('Отметьте согласие на обработку данных, без него подбор не работает'); return; }
+    const pick = k => f.querySelector(`[data-pick="${k}"] .on`)?.dataset.v;
+    st.profile = {city:$('#f-city').value.replace(' (скоро)', ''), size:pick('size'), shoe:pick('shoe'), style:pick('style'), budget:+$('#f-budget').value || 15000};
+    if (st.profile.city === 'Курган') toast('Курган подключаем следующим. Пока показываем Тюмень');
+    st.profile.city = 'Тюмень';
+    save(); ui.stack = []; ui.tab = 'home'; render(true);
+  }
+  if (f.id === 'searchForm'){ const q = $('#q').value.trim(); const pq = parseQuery(q); if (pq.missing.length){ pq.missing.forEach(m => { const ex = st.demand.find(d => d.q === m); ex ? ex.n++ : st.demand.unshift({q:m, n:1}); }); save(); } go('catalog', {q}); const t = q.toLowerCase(); if (AI && t && !aiState('search' + t)?.data) aiRun('search' + t, () => AI_TASKS.search(q).then(d => { addDemand(Array.isArray(d?.missing) ? d.missing : []); save(); return d; })); }
+  if (f.id === 'askForm'){ const v = $('#ask').value.trim(); if (v) AI ? askStylistAI(v) : askStylist(v); }
+  if (f.id === 'issueForm'){
+    const code = $('#issueCode').value.trim().toUpperCase().replace(/^VD/, 'ВД').replace(/^ВД-?/, 'ВД-');
+    issue(st.bookings.find(b => b.code === code && b.sid === ui.cabStore));
+  }
+});
+document.addEventListener('change', e => {
+  const t = e.target;
+  if (t.id === 'cabStore'){ ui.cabStore = t.value; render(); }
+  if (t.dataset.inv){ const [pid, sid, z] = t.dataset.inv.split('|'); st.inv[pid][sid][z] = Math.max(0, +t.value || 0); save(); toast('Остаток обновлён, покупатели видят его сразу'); }
+  if (t.id === 'photo' && t.files[0]){
+    const r = new FileReader();
+    const file = t.files[0], note = ($('#ask')?.value || '').trim();
+    r.onload = () => { ui.chat.push({me:true, html:`<img src="${r.result}" alt="Фото-пример" style="border-radius:12px;max-height:180px">${note ? '<br>' + esc(note) : ''}`}); AI && AI_IMG ? askStylistAI(note || 'Собери похожий образ', file) : askStylist('похожий образ, тёмные цвета, классика'); };
+    r.readAsDataURL(file);
+  }
+  if (t.id === 'cardPhoto' && t.files[0] && AI){ const file = t.files[0]; aiRun('card', () => AI_TASKS.card(file)); }
+  if (t.id === 'csv' && t.files[0]){
+    const r = new FileReader();
+    r.onload = () => {
+      let n = 0;
+      r.result.split(/\r?\n/).forEach(line => {
+        const [name, sz, q] = line.split(/[;,]/).map(x => x && x.trim());
+        const p = PRODUCTS.find(x => x.name.toLowerCase() === (name || '').toLowerCase());
+        if (p && st.inv[p.id][ui.cabStore] && sz && !isNaN(+q)){ st.inv[p.id][ui.cabStore][sz] = +q; n++; }
+      });
+      save(); toast(n ? `Обновлено строк: ${n}` : 'Ни одна строка не совпала с товарами магазина'); render();
+    };
+    r.readAsText(t.files[0]);
+  }
+});
+function guideGo(k){
+  if (k === 'reset'){ st = fresh(); ui = {...ui, mode:'buyer', tab:'home', stack:[], chat:[], lastLook:null}; save(); render(true); toast('Демо сброшено'); return; }
+  if (!st.profile && k !== 'onb'){ st.profile = {city:'Тюмень', size:'S', shoe:'38', style:'классика', budget:15000}; save(); }
+  ui.mode = 'buyer'; ui.stack = []; ui.tab = 'home';
+  if (k === 'onb'){ go('onb'); }
+  if (k === 'stylist'){ ui.chat = []; go('stylist'); }
+  if (k === 'look'){ ui.chat = []; ui.stack = []; askStylist('Образ на учёбу до 15 000 ₽'); }
+  if (k === 'product'){ go('product', {id:'p4'}); }
+  if (k === 'bookings'){ const b = book('p4', 'stil1', qty('p4', 'stil1', st.profile.size) ? st.profile.size : 'M'); if (b){ save(); go('booking', {ids:[b.id]}); } else go('product', {id:'p4'}); }
+  if (k === 'cabinet'){ ui.mode = 'store'; ui.cabTab = 'bk'; ui.cabStore = 'stil1'; render(true); }
+  if (k === 'demand'){ ui.mode = 'store'; ui.cabTab = 'demand'; render(true); }
+}
+render(true);
+</script>
+
+</body></html>
