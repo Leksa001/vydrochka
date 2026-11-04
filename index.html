@@ -99,10 +99,10 @@ p{margin:0}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .grid2 .pcard{width:auto}
 /* текст и картинка в баннере — в разных колонках, чтобы не наезжали друг на друга на узком экране */
-.banner{background:var(--card);border-radius:var(--r-xl);padding:20px 0 0 20px;display:grid;grid-template-columns:1fr 36%;gap:6px;align-items:end;overflow:hidden}
-.banner .txt{display:flex;flex-direction:column;gap:10px;padding-bottom:20px;min-width:0}
+.banner{background:var(--card);border-radius:var(--r-xl);padding:20px;position:relative;overflow:hidden;min-height:170px;display:flex;align-items:center}
+.banner .txt{display:flex;flex-direction:column;gap:10px;width:58%;position:relative;z-index:1}
 .banner h2{font-size:24px;font-weight:800;line-height:1.08}
-.banner img{width:100%;height:auto;max-height:170px;object-fit:contain;object-position:bottom right;mix-blend-mode:multiply}
+.banner img{position:absolute;top:0;right:0;width:46%;height:100%;object-fit:cover;object-position:35% 30%;-webkit-mask-image:linear-gradient(to right,transparent,#000 30%);mask-image:linear-gradient(to right,transparent,#000 30%)}
 .lookblock{display:grid;grid-template-columns:1fr 1.15fr;gap:10px}
 .lookblock .model{background:var(--card);border-radius:var(--r-xl);overflow:hidden}
 .lookblock .model img{width:100%;height:100%;object-fit:cover;mix-blend-mode:multiply;min-height:200px}
@@ -246,6 +246,9 @@ th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);whit
 th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
 tr:last-child td{border-bottom:0}
 .qrow input.q,td input.q{width:52px;height:32px;border:1px solid var(--line);border-radius:8px;background:var(--white);text-align:center}
+.heat{display:grid;grid-template-columns:26px repeat(6,1fr);gap:3px;font-size:10px;color:var(--muted);align-items:center}
+.heat i{display:block;height:22px;border-radius:4px;background:var(--ink)}
+.reply{background:var(--card);border-radius:var(--r-m);padding:10px 12px;font-size:13px;display:flex;flex-direction:column;gap:2px}
 .cols2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 pre.json{background:var(--ink);color:#EDE6DF;border-radius:var(--r-m);padding:14px;font-size:12px;overflow-x:auto;margin:0;font-family:ui-monospace,Consolas,monospace}
 .tariffs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
@@ -342,7 +345,7 @@ function fresh(){
   const inv = {}; PRODUCTS.forEach(p => inv[p.id] = JSON.parse(JSON.stringify(p.stock)));
   const now = Date.now();
   return {profile:null, fav:[], looks:[], demand:[], reports:{}, stats:{}, inv,
-    subs:[], recent:[], notes:[], prefs:{bk:true, stock:true, promo:false}, auth:null,
+    subs:[], recent:[], notes:[], promos:{}, replies:{}, prefs:{bk:true, stock:true, promo:false}, auth:null,
     bookings:[
       {id:'b1', code:'ВД-3170', pid:'p4', sid:'stil1', sz:'M', created:now-3*3600e3, status:'active', seed:true},
       {id:'b2', code:'ВД-8842', pid:'p7', sid:'stil1', sz:'S', created:now-26*3600e3, status:'done', seed:true},
@@ -731,7 +734,7 @@ VIEWS.product = ({id}) => {
       ${AI ? aiBox('fit' + p.id, `<button class="btn sm ghost" style="align-self:flex-start" data-act="aifit" data-id="${p.id}">${ICON.spark.replace('<svg','<svg width="16" height="16"')} Какой размер мне брать?</button>`) : ''}</div>` : ''}
     <h2 class="h2">Где есть${p.cat !== 'bag' ? ' размер ' + esc(sz) : ''}</h2>
     <div class="avail">${rows.map(r => { const f = fresh_(r.s); return `<div class="a">
-      <div><b>${esc(r.s.name)}</b> <span class="sub">· ${esc(r.s.branch)}</span></div>
+      <div><b>${esc(r.s.name)}</b> <span class="sub">· ${esc(r.s.branch)}</span>${promoOf(p.id, r.s.id) ? `<div><span class="pill ok">−${promoOf(p.id, r.s.id)}% · ${rub(Math.round(p.price * (1 - promoOf(p.id, r.s.id) / 100)))}</span></div>` : ''}</div>
       <div class="r">${r.q > 0 ? `<button class="btn sm" data-act="book" data-id="${p.id}" data-sid="${r.s.id}" data-sz="${esc(sz)}">Забронировать</button>` : '<span class="pill bad">нет размера</span>'}</div>
       <div class="sub">${kmTxt(km(r.s))} · ${walk(km(r.s))} · ${r.q > 0 ? (r.q === 1 ? 'последняя штука' : r.q + ' шт.') : 'есть: ' + Object.entries(r.all).filter(([, q]) => q > 0).map(([s]) => s).join(', ')}</div>
       <div style="grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><span class="pill ${f.cls}">${f.t}</span><button class="link" style="font-size:12px" data-act="report" data-sid="${r.s.id}" data-id="${p.id}">Вещи не оказалось?</button></div>
@@ -818,9 +821,11 @@ VIEWS.storepage = ({id}) => {
     <img src="img/${s.photo}" alt="" style="border-radius:var(--r-xl);aspect-ratio:16/9;object-fit:cover;width:100%">
     <h1 class="h1">${esc(s.name)}</h1>
     <p class="sub">${esc(s.branch)} · ${kmTxt(km(s))} · ${s.hours}</p>
-    <div class="row" style="flex-wrap:wrap"><span class="pill ${f.cls}">${f.t}</span><span class="pill n">наличие из: ${esc(s.sync)}</span>${st.reports[id] ? `<span class="pill warn">жалоб на наличие: ${st.reports[id]}</span>` : ''}</div>
+    <div class="row" style="flex-wrap:wrap"><span class="pill ${f.cls}">${f.t}</span><span class="pill n">наличие из: ${esc(s.sync)}</span>${st.reports[id] ? `<span class="pill warn">жалоб на наличие: ${st.reports[id]}</span>` : ''}${quality(s).score >= GOOD ? '<span class="pill ok">Надёжное наличие</span>' : ''}<span class="pill n">★ ${ratingOf(s).toFixed(1)}</span></div>
     <h2 class="h2">Сейчас в магазине</h2>
     <div class="grid2">${items.map(p => pcard(p)).join('')}</div>
+    <h2 class="h2">Отзывы</h2>
+    <div class="col" style="gap:10px">${reviewsOf(s).slice(0, 4).map(x => `<div class="panel" style="gap:6px"><div class="between"><b style="font-size:13px">${esc(x.who)}</b><span class="note">${x.q ? 'вопрос' : '★'.repeat(x.r) + '☆'.repeat(5 - x.r)} · ${x.ago} дн. назад</span></div><span style="font-size:14px">${esc(x.t)}</span>${st.replies[x.id] ? `<div class="reply"><b>Ответ магазина</b>${esc(st.replies[x.id])}</div>` : ''}</div>`).join('')}</div>
   </div>`;
 };
 
@@ -932,8 +937,8 @@ VIEWS.profile = () => {
 
 /* ================= КАБИНЕТ МАГАЗИНА ================= */
 const myStores = () => STORES.filter(s => s.name === st.auth?.brand);
-const CAB_TABS = [['sum','Сводка',ICON.chart],['bk','Брони',ICON.ticket],['inv','Товары',ICON.box],['demand','Спрос',ICON.search],['more','Ещё',ICON.more]];
-const CAB_TITLE = {sum:'Сводка', bk:'Брони', inv:'Товары и остатки', demand:'Спрос в городе', more:'Магазин и тариф'};
+const CAB_TABS = [['sum','Сводка',ICON.chart],['bk','Брони',ICON.ticket],['inv','Товары',ICON.box],['demand','Клиенты',ICON.search],['more','Ещё',ICON.more]];
+const CAB_TITLE = {sum:'Сводка', bk:'Брони', inv:'Товары и остатки', demand:'Клиенты и спрос', more:'Магазин и тариф'};
 /* Демо-история за 180 дней: детерминированная по магазину, чтобы цифры не прыгали при перезагрузке */
 function rnd(seed){ let h = 2166136261; for (const c of seed) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return () => { h = Math.imul(h ^ h >>> 15, 2246822507); h = Math.imul(h ^ h >>> 13, 3266489909); return ((h ^= h >>> 16) >>> 0) / 4294967296; }; }
 const SERIES = {};
@@ -965,6 +970,72 @@ const HINT = {
 const lowStock = s => PRODUCTS.filter(p => st.inv[p.id][s.id] && sizesOf(p).some(z => qty(p.id, s.id, z) <= 1 && (p.stock[s.id][z] || 0) > 0));
 const SEED_WAIT = [{pid:'p4', sz:'XS', n:4}, {pid:'p7', sz:'XL', n:3}, {pid:'p9', sz:'40', n:5}, {pid:'p3', sz:'XS', n:2}, {pid:'p2', sz:'L', n:3}];
 const waitFor = s => [...SEED_WAIT.filter(w => st.inv[w.pid][s.id]), ...st.subs.filter(x => st.inv[x.pid][s.id] && !qty(x.pid, s.id, x.sz)).map(x => ({...x, n:1, live:true}))];
+/* Отзывы и вопросы о магазине (демо). Ответ магазина видят все покупатели — как в Яндекс Бизнесе и 2ГИС */
+const REVIEW_POOL = [
+  {r:5, who:'Анна', t:'Забронировала вечером, утром всё уже ждало на кассе. Примерила и сразу купила.'},
+  {q:1, who:'Мария', t:'Будет ли этот же пиджак в размере XS? Готова подождать.'},
+  {r:2, who:'Ксения', t:'В приложении был мой размер, а в магазине сказали, что продан. Зря ехала.'},
+  {r:4, who:'Олег', t:'Нормальный выбор, но в субботу очередь в примерочную минут 15.'},
+  {q:1, who:'Дарья', t:'Можно продлить бронь до вечера субботы? Раньше не успею.'},
+  {r:5, who:'Елена', t:'Продавец помогла с размером, подсказала, что модель большемерит. Спасибо!'},
+  {r:3, who:'Ирина', t:'Вещи хорошие, но долго искали мою бронь на складе.'},
+];
+function reviewsOf(s){
+  const r = rnd(s.id + 'rev');
+  return REVIEW_POOL.map((x, i) => ({...x, id:s.id + '-r' + i, ago:1 + Math.floor(r() * 9)})).filter(() => r() > .3).sort((a, b) => a.ago - b.ago);
+}
+const ratingOf = s => { const rs = reviewsOf(s).filter(x => x.r); return rs.length ? rs.reduce((a, x) => a + x.r, 0) / rs.length : 0; };
+/* Индекс качества 0–100, как «Индекс качества» Ozon и знак «Хорошее место» Яндекса: от него зависит место в выдаче */
+function quality(s){
+  const f = fresh_(s), bk = st.bookings.filter(b => b.sid === s.id), done = bk.filter(b => bkStatus(b) === 'done').length, exp = bk.filter(b => b.status === 'expired').length;
+  const rv = reviewsOf(s), ans = rv.filter(x => st.replies[x.id]).length, rep = st.reports[s.id] || 0;
+  const parts = [
+    ['Свежие остатки', f.cls === 'ok' ? 25 : 8, 'inv', f.cls === 'ok' ? 'Остатки обновляются автоматически' : 'Данным больше суток: подключите кассу или загрузите файл'],
+    ['Брони выданы вовремя', done + exp ? Math.round(25 * done / (done + exp)) : 25, 'bk', exp ? `Не пришли за бронью: ${exp}. Выдавайте по коду и отмечайте неявки` : 'Все брони закрыты'],
+    ['Ответы на отзывы и вопросы', rv.length ? Math.round(25 * ans / rv.length) : 25, 'demand', ans < rv.length ? `Без ответа: ${rv.length - ans}. Ответ видят все покупатели` : 'На всё ответили'],
+    ['Нет жалоб на наличие', Math.max(0, 25 - rep * 8), 'inv', rep ? `Жалоб «вещи не оказалось»: ${rep}` : 'Жалоб нет'],
+  ];
+  return {score:parts.reduce((a, p) => a + p[1], 0), parts};
+}
+const GOOD = 80;
+/* Скидки магазина на товар: видны покупателю в карточке, приходят тем, у кого вещь в избранном */
+const promoOf = (pid, sid) => st.promos[pid + '|' + sid] || 0;
+/* Цены таких же вещей в других магазинах рядом, как «Индекс цен» Ozon (в прототипе — демо-цены вокруг вашей) */
+function priceIdx(p, s){
+  const r = rnd(p.id + 'px'), ps = [0, 1, 2].map(() => Math.round(p.price * (.8 + r() * .45) / 10) * 10), avg = ps.reduce((a, x) => a + x, 0) / ps.length, mine = p.price * (1 - promoOf(p.id, s.id) / 100), d = Math.round((mine - avg) / avg * 100);
+  return `<span class="note">Такие же вещи у других магазинов рядом: ${rub(Math.min(...ps))}–${rub(Math.max(...ps))}, в среднем ${rub(Math.round(avg / 10) * 10)}. ${Math.abs(d) < 5 ? 'Ваша цена в рынке' : d > 0 ? `<b style="color:var(--warn)">Ваша дороже на ${d}%</b>` : `<b style="color:var(--ok)">Ваша дешевле на ${-d}%</b>`}</span>`;
+}
+/* Когда приходят покупатели: дни недели × часы, как «Популярное время» в картах */
+const SLOTS = ['10', '12', '14', '16', '18', '20'], DAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+function peak(s){
+  const r = rnd(s.id + 'peak'), w = [.3, .6, .7, .8, 1, .6];
+  return DAYS.map((_, d) => SLOTS.map((_, h) => Math.round(20 * w[h] * (d >= 5 ? 1.5 : d === 4 ? 1.2 : 1) * (.6 + r() * .6))));
+}
+function peakPanel(s){
+  const m = peak(s), max = Math.max(...m.flat()); let best = [0, 0];
+  m.forEach((row, d) => row.forEach((v, h) => { if (v > m[best[0]][best[1]]) best = [d, h]; }));
+  const quiet = m.map(row => row.reduce((a, v) => a + v, 0)), qd = quiet.indexOf(Math.min(...quiet));
+  return `<div class="panel"><b>Когда приходят покупатели</b><span class="sub">Визиты по броням за 90 дней, по дням недели и часам. Чем темнее, тем больше людей.</span>
+    <div class="heat"><span></span>${SLOTS.map(h => `<span>${h}:00</span>`).join('')}${m.map((row, d) => `<span>${DAYS[d]}</span>${row.map((v, h) => `<i style="opacity:${(.08 + .92 * v / max).toFixed(2)}" title="${DAYS[d]}, ${SLOTS[h]}:00–${+SLOTS[h] + 2}:00: ${v} визитов"></i>`).join('')}`).join('')}</div>
+    <div class="todo" style="background:var(--card)"><span class="t"><b>Пик: ${DAYS[best[0]]}, ${SLOTS[best[1]]}:00–${+SLOTS[best[1]] + 2}:00</b>Поставьте в это время второго продавца на примерочные и выдачу броней. Самый тихий день — ${DAYS[qd].toLowerCase()}: удобно для приёмки и инвентаризации.</span></div></div>`;
+}
+function qualityPanel(s){
+  const q = quality(s), good = q.score >= GOOD;
+  return `<div class="panel"><div class="between" style="flex-wrap:wrap;gap:6px"><b>Индекс качества магазина</b>${good ? '<span class="pill ok">знак «Надёжное наличие»</span>' : `<span class="pill warn">до знака ${GOOD - q.score} баллов</span>`}</div>
+    <div class="row" style="gap:12px;align-items:baseline"><b class="num" style="font-size:36px">${q.score}</b><span class="sub">из 100. От индекса зависит место в поиске и подборках стилиста. С ${GOOD} баллов магазин получает знак в приложении покупателя.</span></div>
+    <div class="col" style="gap:6px">${q.parts.map(([t, v, cab, d]) => `<button class="todo" data-cab="${cab}"><span class="dot" style="background:var(--${v >= 22 ? 'ok' : v >= 12 ? 'warn' : 'bad'})"></span><span class="t"><b>${t}: ${v} из 25</b>${esc(d)}</span><span>›</span></button>`).join('')}</div></div>`;
+}
+function reviewsPanel(s){
+  const rv = reviewsOf(s), rt = ratingOf(s), wait = rv.filter(x => !st.replies[x.id]).length;
+  return `<div class="panel"><div class="between" style="flex-wrap:wrap;gap:6px"><b>Отзывы и вопросы</b>${wait ? `<span class="pill warn">без ответа: ${wait}</span>` : '<span class="pill ok">на всё ответили</span>'}</div>
+    <span class="sub">Рейтинг <b class="num">${rt.toFixed(1)}</b> из 5 по ${rv.filter(x => x.r).length} отзывам после выдачи брони. Ответ магазина видят все покупатели, а на вопрос — ещё и автор в уведомлениях.</span>
+    <div class="col" style="gap:10px">${rv.map(x => `<div class="icard">
+      <div class="between"><b style="font-size:13px">${esc(x.who)}</b><span class="note">${x.q ? '<span class="pill n">вопрос</span> ' : '★'.repeat(x.r) + '☆'.repeat(5 - x.r) + ' '}${x.ago} дн. назад</span></div>
+      <span style="font-size:14px">${esc(x.t)}</span>
+      ${st.replies[x.id] ? `<div class="reply"><b>Ваш ответ</b>${esc(st.replies[x.id])}</div>`
+        : `<form class="replyForm col" data-id="${x.id}" style="gap:6px"><textarea rows="2" placeholder="${x.q ? 'Ответьте на вопрос' : x.r <= 3 ? 'Извинитесь и расскажите, что исправили' : 'Поблагодарите покупателя'}" aria-label="Ответ для ${esc(x.who)}" style="border-radius:var(--r-m);border:1px solid var(--line);padding:10px 12px;background:var(--white);resize:vertical"></textarea><button class="btn sm" style="align-self:flex-start">Ответить</button></form>`}
+    </div>`).join('')}</div></div>`;
+}
 
 function vLogin(){
   const lg = ui.login || {};
@@ -1025,6 +1096,7 @@ CAB.sum = s => {
   const lost = {expired:st.bookings.filter(b => b.sid === s.id && bkStatus(b) === 'expired').length, cancel:st.bookings.filter(b => b.sid === s.id && b.status === 'cancel').length};
   return `<div class="between" style="flex-wrap:wrap;gap:8px"><div class="seg" style="flex:1;max-width:320px">${[7, 30, 90].map(d => `<button data-act="period" data-id="${d}" class="${n === d ? 'on' : ''}">${d} дней</button>`).join('')}</div><span class="demo">демо-данные</span></div>
     ${todo.length ? `<div class="panel"><b>Что сделать сейчас</b><div class="col" style="gap:8px">${todo.map(([cab, c, t, d]) => `<button class="todo" data-cab="${cab}"><span class="dot" style="background:var(--${c})"></span><span class="t"><b>${t}</b>${esc(d)}</span><span>›</span></button>`).join('')}</div></div>` : ''}
+    ${qualityPanel(s)}
     <div class="kpis">
       <div class="kpi"><span>Выручка через сервис</span><b class="num">${rub(k.visits * AVG_CHECK)}</b>${delta(k.visits, p.visits)}</div>
       <div class="kpi"><span>Пришли покупатели</span><b class="num">${k.visits}</b>${delta(k.visits, p.visits)}</div>
@@ -1038,6 +1110,7 @@ CAB.sum = s => {
     <div class="panel"><div class="between"><b>Визиты по ${n > 30 ? 'неделям' : 'дням'}</b><span class="sub">всего ${k.visits}</span></div>
       <div class="bars">${groups.map((g, i) => `<i style="height:${vals[i] / max * 100}%" title="${fmt(g[0].d)}${g.length > 1 ? ' – ' + fmt(g[g.length - 1].d) : ''}: ${vals[i]} визитов"></i>`).join('')}</div>
       <div class="between note"><span>${fmt(days[0].d)}</span><span>сегодня</span></div></div>
+    ${peakPanel(s)}
     <div class="cols2">
       <div class="panel"><b>Топ товаров</b><div class="col" style="gap:8px">${top.slice(0, 5).map(x => `<div class="row" style="gap:10px"><img src="img/${x.p.img}.jpg" alt="" style="width:40px;height:40px;object-fit:contain;background:var(--white);border-radius:10px"><div class="grow" style="min-width:0"><b style="font-size:13px">${esc(x.p.name)}</b><div class="note">${x.v} просмотров · ${x.b} броней · осталось ${x.left} шт.</div></div>${x.left <= 1 ? '<span class="pill warn">мало</span>' : ''}</div>`).join('')}</div></div>
       <div class="panel"><b>Почему теряем брони</b><div class="col" style="gap:6px;font-size:13px">
@@ -1072,6 +1145,8 @@ CAB.inv = s => {
     <div class="cardlist">${items.map(p => { const tot = sizesOf(p).reduce((a, z) => a + qty(p.id, s.id, z), 0); return `<div class="icard">
       <div class="h"><img src="img/${p.img}.jpg" alt=""><div class="t"><b>${esc(p.name)}</b><span class="sub">${rub(p.price)} · всего ${tot} шт.</span></div>${tot === 0 ? '<span class="pill bad">нет</span>' : low.includes(p) ? '<span class="pill warn">мало</span>' : ''}</div>
       <div class="qrow">${sizesOf(p).map(z => `<label>${z === 'one' ? 'шт.' : z}<input class="q num" type="number" min="0" inputmode="numeric" value="${qty(p.id, s.id, z)}" data-inv="${p.id}|${s.id}|${z}" aria-label="${esc(p.name)}, ${z === 'one' ? 'штук' : 'размер ' + z}"></label>`).join('')}</div>
+      ${priceIdx(p, s)}
+      <div class="row" style="gap:6px;flex-wrap:wrap"><span class="note">Скидка:</span>${[0, 10, 15, 20].map(v => `<button class="chip ${promoOf(p.id, s.id) === v ? 'on' : ''}" style="height:32px;padding:0 12px;font-size:13px" data-act="promo" data-id="${p.id}" data-v="${v}">${v ? '−' + v + '%' : 'нет'}</button>`).join('')}</div>
     </div>`; }).join('')}</div>
     <div class="cols2">
       <div class="panel"><b>Как подключить остатки</b><ul style="margin:0;padding-left:18px;font-size:13px;color:var(--ink-2);display:flex;flex-direction:column;gap:6px">
@@ -1096,7 +1171,7 @@ function cardPanel(){
 CAB.demand = s => {
   const all = [...st.demand.map(d => ({...d, live:true})), ...SEED_DEMAND];
   const max = Math.max(...all.map(d => d.n)), wait = waitFor(s);
-  return `<div class="panel"><b>Лист ожидания вашего магазина</b><span class="sub">Покупатели подписались на размеры, которых у вас сейчас нет. Как только вы внесёте остаток, они получат уведомление.</span>
+  return `${reviewsPanel(s)}<div class="panel"><b>Лист ожидания вашего магазина</b><span class="sub">Покупатели подписались на размеры, которых у вас сейчас нет. Как только вы внесёте остаток, они получат уведомление.</span>
       ${wait.length ? `<div class="col" style="gap:8px">${wait.map(w => { const p = P(w.pid); return `<div class="row" style="gap:10px"><img src="img/${p.img}.jpg" alt="" style="width:40px;height:40px;object-fit:contain;background:var(--white);border-radius:10px"><div class="grow" style="min-width:0"><b style="font-size:13px">${esc(p.name)}</b><div class="note">размер ${esc(w.sz)}${w.live ? ' · <span class="pill ok">новая подписка</span>' : ''}</div></div><b class="num">${w.n} чел.</b></div>`; }).join('')}</div>` : '<p class="note">Пока никто не ждёт.</p>'}</div>
     <div class="panel"><b>Что ищут в Тюмени и не находят</b><span class="sub">Запросы, на которые ни у одного магазина-партнёра не нашлось вещей. Подсказка, что завезти.</span>
       <div class="funnel">${all.map(d => `<div class="fbar"><span style="white-space:normal">${esc(d.q)}${d.live ? ' <span class="pill ok">новый</span>' : ''}</span><b class="num">${d.n}</b><div class="tr"><i style="width:${Math.max(4, d.n / max * 100)}%"></i></div></div>`).join('')}</div></div>
@@ -1239,6 +1314,9 @@ document.addEventListener('click', e => {
     case 'tostore': location.hash = 'store'; break;
     case 'tobuyer': location.hash = ''; break;
     case 'issue': issue(st.bookings.find(b => b.id === id)); break;
+    case 'promo': { const v = +t.dataset.v, k = id + '|' + ui.cabStore, sn = S(ui.cabStore); if (v) st.promos[k] = v; else delete st.promos[k];
+      if (v && st.fav.includes(id)) note(`Скидка −${v}% на «${P(id).name}» в «${sn.name}», ${sn.branch}`, 'promo');
+      save(); toast(v ? `Скидка −${v}% включена. Покупатели видят её в карточке, а у кого вещь в избранном и включены уведомления об акциях, получат сообщение` : 'Скидка выключена'); render(); break; }
   }
 });
 function issue(b){
@@ -1258,12 +1336,13 @@ document.addEventListener('submit', e => {
   }
   if (f.id === 'searchForm'){ const q = $('#q').value.trim(); const pq = parseQuery(q); if (pq.missing.length){ pq.missing.forEach(m => { const ex = st.demand.find(d => d.q === m); ex ? ex.n++ : st.demand.unshift({q:m, n:1}); }); save(); } go('catalog', {q}); const t = q.toLowerCase(); if (AI && t && !aiState('search' + t)?.data) aiRun('search' + t, () => AI_TASKS.search(q).then(d => { addDemand(Array.isArray(d?.missing) ? d.missing : []); save(); return d; })); }
   if (f.id === 'askForm'){ const v = $('#ask').value.trim(); if (v) AI ? askStylistAI(v) : askStylist(v); }
+  if (f.classList.contains('replyForm')){ const v = f.querySelector('textarea').value.trim(); if (!v){ toast('Напишите ответ'); return; } st.replies[f.dataset.id] = v; save(); toast('Ответ опубликован. Индекс качества вырос'); render(); }
   if (f.id === 'issueForm'){
     const code = $('#issueCode').value.trim().toUpperCase().replace(/^VD/, 'ВД').replace(/^ВД-?/, 'ВД-');
     issue(st.bookings.find(b => b.code === code && b.sid === ui.cabStore));
   }
   if (f.id === 'loginForm'){
-    const digits = x => x.replace(/D/g, '').slice(-10), phone = $('#lg-phone').value, acc = ACCOUNTS.find(a => digits(a.phone) === digits(phone));
+    const digits = x => x.replace(/\D/g, '').slice(-10), phone = $('#lg-phone').value, acc = ACCOUNTS.find(a => digits(a.phone) === digits(phone));
     if (!ui.login?.sent){
       if (!acc){ toast('Номер не найден среди партнёров. Выберите демо-магазин ниже'); return; }
       ui.login = {phone:acc.phone, sent:true}; render(); toast(`Демо: SMS не отправляем, код ${DEMO_CODE}`); $('#lg-code')?.focus(); return;
