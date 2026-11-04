@@ -1,4 +1,4 @@
-self.VERSION = "2026-11-04T16:03:31.592Z";
+self.VERSION = "2026-11-04T16:52:36.900Z";
 self.PRECACHE = [
  "./",
  "index.html",

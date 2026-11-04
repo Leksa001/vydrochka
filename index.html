@@ -98,15 +98,14 @@ p{margin:0}
 .ad{position:absolute;left:8px;top:8px;font-size:10px;font-weight:700;background:rgba(255,255,255,.9);padding:2px 7px;border-radius:var(--pill);color:var(--ink-2)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .grid2 .pcard{width:auto}
-.banner{background:var(--card);border-radius:var(--r-xl);padding:22px;display:flex;align-items:center;gap:8px;overflow:hidden;position:relative;min-height:190px}
-.banner .txt{display:flex;flex-direction:column;gap:12px;position:relative;z-index:1;max-width:60%}
-.banner h2{font-size:28px;font-weight:800;line-height:1.05}
-.banner img{position:absolute;right:-6px;bottom:0;width:44%;height:auto;max-height:100%;object-fit:contain;object-position:bottom right;mix-blend-mode:multiply}
-.lookblock{display:grid;grid-template-columns:1.05fr 1fr;gap:10px}
-.lookblock .model{background:var(--card);border-radius:var(--r-xl);overflow:hidden;position:relative;display:flex;flex-direction:column}
-.lookblock .model h3{position:absolute;top:14px;left:16px;font-size:18px;font-weight:800;z-index:1}
-.lookblock .model img{flex:1;width:100%;object-fit:cover;mix-blend-mode:multiply;min-height:0}
-.lookblock .model .btn{position:absolute;left:10px;right:10px;bottom:10px;height:44px;font-size:13px}
+/* текст и картинка в баннере — в разных колонках, чтобы не наезжали друг на друга на узком экране */
+.banner{background:var(--card);border-radius:var(--r-xl);padding:20px 0 0 20px;display:grid;grid-template-columns:1fr 36%;gap:6px;align-items:end;overflow:hidden}
+.banner .txt{display:flex;flex-direction:column;gap:10px;padding-bottom:20px;min-width:0}
+.banner h2{font-size:24px;font-weight:800;line-height:1.08}
+.banner img{width:100%;height:auto;max-height:170px;object-fit:contain;object-position:bottom right;mix-blend-mode:multiply}
+.lookblock{display:grid;grid-template-columns:1fr 1.15fr;gap:10px}
+.lookblock .model{background:var(--card);border-radius:var(--r-xl);overflow:hidden}
+.lookblock .model img{width:100%;height:100%;object-fit:cover;mix-blend-mode:multiply;min-height:200px}
 .mini{background:var(--paper);border-radius:var(--r-l);padding:8px;display:flex;gap:8px;align-items:center;text-align:left;width:100%}
 .mini img{width:58px;height:58px;object-fit:contain;flex:none;background:var(--white);border-radius:12px}
 .mini .t{min-width:0;flex:1}
@@ -193,38 +192,79 @@ p{margin:0}
 .cab nav button{text-align:left;padding:10px 12px;border-radius:12px;font-weight:600;font-size:14px;color:rgba(247,243,239,.7)}
 .cab nav button.on{background:rgba(247,243,239,.12);color:var(--paper)}
 .cab nav .sp{flex:1}
-.cab nav select{background:rgba(247,243,239,.12);border:0;border-radius:10px;padding:8px;color:var(--paper);font-size:13px}
-.cab nav select option{color:var(--ink)}
-.cab main{padding:24px;display:flex;flex-direction:column;gap:18px;min-width:0}
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.kpi{background:var(--paper);border-radius:var(--r-l);padding:14px;display:flex;flex-direction:column;gap:4px}
-.kpi b{font-size:26px;font-weight:800}
+.cab main{padding:24px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.cabhead{display:flex;align-items:center;gap:10px}
+.cabhead .t{flex:1;min-width:0}
+.cabhead select{max-width:100%;border:1px solid var(--line);background:var(--paper);border-radius:var(--pill);height:40px;padding:0 12px;font-weight:700;font-size:13px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.kpi{background:var(--paper);border-radius:var(--r-l);padding:14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.kpi b{font-size:24px;font-weight:800}
 .kpi span{font-size:12px;color:var(--muted);font-weight:600}
-.funnel{display:flex;flex-direction:column;gap:8px}
-.fbar{display:grid;grid-template-columns:150px 1fr 60px;gap:10px;align-items:center;font-size:13px}
-.fbar .tr{height:24px;background:var(--card);border-radius:8px;overflow:hidden}
-.fbar .tr i{display:block;height:100%;background:var(--ink);border-radius:8px}
+.kpi .d{font-size:12px;font-weight:700}
+.up{color:var(--ok)} .dn{color:var(--bad)}
+.funnel{display:flex;flex-direction:column;gap:10px}
+.fbar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:center;font-size:13px}
+.fbar .tr{grid-column:1/-1;height:12px;background:var(--card);border-radius:6px;overflow:hidden}
+.fbar .tr i{display:block;height:100%;background:var(--ink);border-radius:6px}
+.step{font-size:12px;color:var(--muted);padding-left:10px;border-left:2px solid var(--line);margin:-2px 0}
+.bars{display:flex;align-items:flex-end;gap:2px;height:110px}
+.bars i{flex:1;background:var(--ink);border-radius:4px 4px 0 0;min-height:2px;position:relative}
+.bars i:hover{background:var(--ink-2)}
+.todo{display:flex;gap:10px;align-items:center;background:var(--paper);border-radius:var(--r-m);padding:12px;text-align:left;width:100%}
+.todo .t{flex:1;min-width:0;font-size:13px}
+.todo .t b{display:block;font-size:14px}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.cardlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.icard{background:var(--paper);border-radius:var(--r-l);padding:12px;display:flex;flex-direction:column;gap:8px}
+.icard .h{display:flex;gap:10px;align-items:center}
+.icard .h img{width:52px;height:52px;object-fit:contain;background:var(--white);border-radius:12px;flex:none}
+.icard .h .t{flex:1;min-width:0}
+.icard .h .t b{display:block;font-size:14px}
+.qrow{display:flex;flex-wrap:wrap;gap:6px}
+.qrow label{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;color:var(--muted);font-weight:700}
+.login{max-width:420px;margin:0 auto;padding:28px 18px;display:flex;flex-direction:column;gap:16px}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.tiles button{background:var(--paper);border-radius:var(--r-m);padding:12px 4px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;font-weight:600;position:relative}
+.tiles button svg{width:22px;height:22px}
+.tiles b{font-size:18px}
+.menu{background:var(--paper);border-radius:var(--r-l);overflow:hidden}
+.menu > button,.menu > label,.menu > a{display:flex;align-items:center;gap:10px;width:100%;padding:14px 16px;border-bottom:1px solid var(--line);text-align:left;font-weight:600;font-size:14px;color:inherit;text-decoration:none}
+.menu > :last-child{border-bottom:0}
+.menu .grow{flex:1}
+.menu input[type=checkbox]{width:20px;height:20px;accent-color:var(--ink)}
+details.faq{background:var(--paper);border-radius:var(--r-m);padding:12px 14px;font-size:14px}
+details.faq summary{font-weight:700;cursor:pointer}
+details.faq p{margin-top:8px;color:var(--ink-2);font-size:13px}
+.alert{background:var(--ink);color:var(--paper);border-radius:var(--r-l);padding:14px;display:flex;gap:12px;align-items:center;text-align:left;width:100%}
+.alert .t{flex:1;min-width:0;font-size:13px}
+.alert b{display:block;font-size:15px}
+.ibtn .badge{position:absolute;top:4px;right:4px;width:10px;height:10px;border-radius:50%;background:var(--bad)}
+.ibtn{position:relative}
 .tbl{overflow-x:auto;background:var(--paper);border-radius:var(--r-l)}
 table{border-collapse:collapse;width:100%;font-size:13px}
 th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
 th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
 tr:last-child td{border-bottom:0}
-td input.q{width:52px;height:32px;border:1px solid var(--line);border-radius:8px;background:var(--white);text-align:center}
+.qrow input.q,td input.q{width:52px;height:32px;border:1px solid var(--line);border-radius:8px;background:var(--white);text-align:center}
 .cols2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 pre.json{background:var(--ink);color:#EDE6DF;border-radius:var(--r-m);padding:14px;font-size:12px;overflow-x:auto;margin:0;font-family:ui-monospace,Consolas,monospace}
 .tariffs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .tariff{background:var(--paper);border-radius:var(--r-l);padding:16px;display:flex;flex-direction:column;gap:8px}
 .tariff.cur{box-shadow:inset 0 0 0 2px var(--ink)}
 .tariff ul{margin:0;padding-left:18px;font-size:13px;color:var(--ink-2);display:flex;flex-direction:column;gap:4px}
-@media (max-width:760px){
+/* на компьютере у кабинета боковое меню, на телефоне — нижние вкладки, как в приложениях продавцов Ozon и WB */
+#phone.wide .tabbar{display:none}
+@media (max-width:900px){
   .cab{grid-template-columns:1fr}
-  .cab nav{flex-direction:row;flex-wrap:wrap;padding:12px}
-  .cab nav .brand{width:100%}
-  .cab nav .sp{display:none}
-  .cab main{padding:16px}
+  .cab nav{display:none}
+  .cab main{padding:16px 16px 24px}
+  #phone.wide .tabbar{display:flex}
+  #phone.wide .tabbar[hidden]{display:none}
+}
+@media (max-width:560px){
   .kpis{grid-template-columns:1fr 1fr}
   .cols2,.tariffs{grid-template-columns:1fr}
-  .fbar{grid-template-columns:110px 1fr 44px}
+  .h1{font-size:26px}
 }
 </style>
 
@@ -239,7 +279,7 @@ pre.json{background:var(--ink);color:#EDE6DF;border-radius:var(--r-m);padding:14
       <li><button data-go="look"><b>3</b>Заменить вещь, увидеть маршрут по магазинам</button></li>
       <li><button data-go="product"><b>4</b>Карточка: наличие по размерам в каждом магазине</button></li>
       <li><button data-go="bookings"><b>5</b>Бронь на 24 часа и QR-код для магазина</button></li>
-      <li><button data-go="cabinet"><b>6</b>Кабинет магазина: выдать бронь по коду</button></li>
+      <li><button data-go="cabinet"><b>6</b>Кабинет магазина: вход по SMS (код 1234), выдать бронь</button></li>
       <li><button data-go="demand"><b>7</b>Спрос: что ищут в городе и не находят</button></li>
     </ol>
     <div class="links">
@@ -293,7 +333,6 @@ const ATTR = {
 PRODUCTS.forEach(p => Object.assign(p, ATTR[p.id]));
 const MISSING = {'плать':'платья','пуховик':'пуховики','куртк':'куртки','кроссов':'кроссовки','джинс':'джинсы','пальто':'пальто','шуб':'шубы','рубаш':'рубашки','шарф':'шарфы'};
 const SEED_DEMAND = [{q:'платье миди до 6 000 ₽',n:23},{q:'пуховик длинный',n:17},{q:'кроссовки белые, 38',n:12},{q:'джинсы прямые, высокая посадка',n:9}];
-const SEED_STATS = {views:1240, cards:430, routes:186, bookings:41, visits:29};
 const CLOTH_SIZES = ['XS','S','M','L','XL'], SHOE_SIZES = ['36','37','38','39','40'];
 const STYLES = ['классика','повседневный','офис','учёба','свидание'];
 
@@ -303,14 +342,28 @@ function fresh(){
   const inv = {}; PRODUCTS.forEach(p => inv[p.id] = JSON.parse(JSON.stringify(p.stock)));
   const now = Date.now();
   return {profile:null, fav:[], looks:[], demand:[], reports:{}, stats:{}, inv,
+    subs:[], recent:[], notes:[], prefs:{bk:true, stock:true, promo:false}, auth:null,
     bookings:[
       {id:'b1', code:'ВД-3170', pid:'p4', sid:'stil1', sz:'M', created:now-3*3600e3, status:'active', seed:true},
       {id:'b2', code:'ВД-8842', pid:'p7', sid:'stil1', sz:'S', created:now-26*3600e3, status:'done', seed:true},
+      {id:'b3', code:'ВД-5521', pid:'p7', sid:'stil1', sz:'M', created:now-50*3600e3, status:'active', seed:true},
+      {id:'b4', code:'ВД-2094', pid:'p4', sid:'stil2', sz:'M', created:now-5*3600e3, status:'active', seed:true},
     ]};
 }
-let st; try { st = JSON.parse(localStorage.getItem(KEY)) || fresh(); } catch(e) { st = fresh(); }
+let st; try { st = Object.assign(fresh(), JSON.parse(localStorage.getItem(KEY)) || {}); } catch(e) { st = fresh(); }
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(st)); } catch(e){} }
-let ui = {mode:'buyer', tab:'home', stack:[], chip:'all', feat:{size:false, style:false}, chat:[], lastLook:null, cabTab:'sum', cabStore:'stil1'};
+let ui = {mode:'buyer', tab:'home', stack:[], chip:'all', feat:{size:false, style:false}, chat:[], lastLook:null, cabTab:'sum', cabStore:'stil1', period:30, bkFilter:'active'};
+/* Демо-аккаунты партнёров: вход по номеру телефона и коду из SMS, как в кабинетах Ozon Seller и Яндекс Бизнеса */
+const ACCOUNTS = [{brand:'Стиль+', phone:'+7 900 000-00-01'}, {brand:'Мода24', phone:'+7 900 000-00-02'}, {brand:'Обувь.Ру', phone:'+7 900 000-00-03'}, {brand:'Trendy', phone:'+7 900 000-00-04'}, {brand:'База', phone:'+7 900 000-00-05'}];
+const DEMO_CODE = '1234';
+// Бронь действует 24 часа; просроченная считается «не пришёл», вещь возвращается в продажу
+const BK_TTL = 24 * 3600e3;
+function bkStatus(b){
+  if (b.status === 'active' && Date.now() > b.created + BK_TTL){ b.status = 'expired'; if (!b.seed && st.inv[b.pid]?.[b.sid]) st.inv[b.pid][b.sid][b.sz] = (st.inv[b.pid][b.sid][b.sz] || 0) + 1; save(); }
+  return b.status;
+}
+const leftTxt = b => { const m = Math.max(0, Math.round((b.created + BK_TTL - Date.now()) / 60000)); return m >= 60 ? `осталось ${Math.floor(m / 60)} ч ${m % 60} мин` : `осталось ${m} мин`; };
+function note(t, kind = 'bk'){ if (st.prefs[kind] === false) return; st.notes.unshift({t, at:Date.now(), read:false}); st.notes = st.notes.slice(0, 30); }
 
 /* ================= ПОМОЩНИКИ ================= */
 const $ = s => document.querySelector(s);
@@ -351,6 +404,12 @@ const ICON = {
   back:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg>',
   pin:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-6-5.3-6-11a6 6 0 0 1 12 0c0 5.7-6 11-6 11Z"/><circle cx="12" cy="10" r="2"/></svg>',
   ticket:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M9 6v12" stroke-dasharray="2 2"/></svg>',
+  bell:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15Z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>',
+  grid:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>',
+  chart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 20V11M12 20V5M19 20v-6"/></svg>',
+  box:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m4 8 8-4 8 4v8l-8 4-8-4Z"/><path d="m4 8 8 4 8-4M12 12v8"/></svg>',
+  more:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>',
+  eye:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>',
 };
 
 /* ================= ИИ-СТИЛИСТ (правила поверх реального каталога) ================= */
@@ -523,15 +582,19 @@ function cur(){ return ui.stack[ui.stack.length - 1] || {view:ui.tab, params:{}}
 function render(scrollTop){
   const phone = $('#phone');
   if (!st.profile && ui.mode === 'buyer' && cur().view !== 'onb'){ ui.stack = [{view:'onb', params:{}}]; }
-  phone.classList.toggle('wide', ui.mode === 'store');
+  const store = ui.mode === 'store', authed = store && st.auth;
+  phone.classList.toggle('wide', !!authed);
   const v = cur();
-  const html = ui.mode === 'store' ? vCabinet() : (VIEWS[v.view] || VIEWS.home)(v.params);
+  const html = store ? (authed ? vCabinet() : vLogin()) : (VIEWS[v.view] || VIEWS.home)(v.params);
   $('#screen').innerHTML = html;
-  $('#tabbar').hidden = ui.mode === 'store' || v.view === 'onb';
-  $('#tabbar').innerHTML = [
-    ['home', ICON.home, 'Главная'], ['looks', ICON.hanger, 'Образы'], ['fav', ICON.heart, 'Избранное'], ['profile', ICON.user, 'Профиль']
+  $('#tabbar').hidden = store ? !authed : v.view === 'onb';
+  $('#tabbar').innerHTML = store ? CAB_TABS.map(([k, t, ic]) => {
+    const n = k === 'bk' ? myStores().reduce((s, x) => s + st.bookings.filter(b => b.sid === x.id && bkStatus(b) === 'active').length, 0) : 0;
+    return `<button data-cab="${k}" class="${ui.cabTab === k ? 'on' : ''}">${ic}${t}${n ? `<span class="cnt">${n}</span>` : ''}</button>`;
+  }).join('') : [
+    ['home', ICON.home, 'Главная'], ['catalog', ICON.grid, 'Каталог'], ['looks', ICON.hanger, 'Образы'], ['bookings', ICON.ticket, 'Брони'], ['profile', ICON.user, 'Профиль']
   ].map(([k, ic, t]) => {
-    const n = k === 'fav' ? st.fav.length : k === 'profile' ? st.bookings.filter(b => !b.seed && b.status === 'active').length : 0;
+    const n = k === 'bookings' ? st.bookings.filter(b => !b.seed && bkStatus(b) === 'active').length : 0;
     return `<button data-tab="${k}" class="${ui.tab === k && !ui.stack.length ? 'on' : ''}">${ic}${t}${n ? `<span class="cnt">${n}</span>` : ''}</button>`;
   }).join('');
   if (scrollTop) $('#screen').scrollTop = 0;
@@ -592,12 +655,15 @@ VIEWS.home = () => {
   list = [...list].sort((a, b) => (b.promo ? 1 : 0) - (a.promo ? 1 : 0) || (where(b).length ? 1 : 0) - (where(a).length ? 1 : 0));
   const look = ui.lastLook || st.looks[0] || buildLook({budget:pr.budget, tags:[pr.style], tone:null, missing:[]});
   const nearStores = [...STORES].sort((a, b) => km(a) - km(b)).slice(0, 3);
+  const act = st.bookings.filter(b => !b.seed && bkStatus(b) === 'active');
+  const unread = st.notes.some(n => !n.read);
   return `<div class="scr">
     <div class="top">
       <div class="brand grow"><img src="img/logo.jpg" alt=""><div><b>Выдрочка</b><small>${esc(pr.city)} · размер ${esc(pr.size)} · обувь ${esc(pr.shoe)}</small></div></div>
-      <button class="ibtn" data-tab="fav" aria-label="Избранное">${ICON.heart}</button>
-      <button class="ibtn" data-act="menu" aria-label="Меню">${ICON.menu}</button>
+      <button class="ibtn" data-act="favs" aria-label="Избранное">${ICON.heart}</button>
+      <button class="ibtn" data-act="notes" aria-label="Уведомления">${ICON.bell}${unread ? '<span class="badge"></span>' : ''}</button>
     </div>
+    ${act.length ? `<button class="alert" data-tab="bookings">${ICON.ticket.replace('<svg', '<svg width="26" height="26"')}<div class="t"><b>${act.length === 1 ? 'Бронь ждёт вас' : 'Брони ждут вас: ' + act.length}</b>${esc(S(act[0].sid).name)}, ${esc(S(act[0].sid).branch)} · ${leftTxt(act[0])}</div><span>›</span></button>` : ''}
     <h1 class="h1">Соберём твой образ?</h1>
     <form class="search" id="searchForm">${ICON.search}<input id="q" placeholder="Найти вещь, бренд или стиль" autocomplete="off"><button type="button" class="ibtn" data-act="stylist" aria-label="ИИ-стилист">${ICON.filter}</button></form>
     <div class="chips">${[['all','Всё'], ...Object.entries(CATS)].map(([k, t]) => `<button class="chip ${ui.chip===k?'on':''}" data-chip="${k}">${t}</button>`).join('')}</div>
@@ -611,10 +677,13 @@ VIEWS.home = () => {
     </div>
     <div class="hscroll">${list.length ? list.map(p => pcard(p)).join('') : '<p class="sub">По этим фильтрам ничего нет. Снимите один из них.</p>'}</div>
 
-    ${look ? `<div class="lookblock">
-      <div class="model"><h3>Твой образ ${ICON.spark.replace('<svg','<svg width="16" height="16"')}</h3><img src="img/look.jpg" alt="Пример образа на модели"><button class="btn" data-act="openlook" data-id="${look.id}">Посмотреть образ →</button></div>
+    ${look ? `<div class="between"><h2 class="h2">Твой образ · ${rub(look.total)}</h2><button class="link" data-act="openlook" data-id="${look.id}">Открыть ›</button></div>
+    <div class="lookblock">
+      <button class="model" data-act="openlook" data-id="${look.id}" aria-label="Открыть образ"><img src="img/look.jpg" alt="Пример образа на модели"></button>
       <div class="col">${look.items.map(it => { const p = P(it.pid); return `<button class="mini" data-act="product" data-id="${p.id}"><img src="img/${p.img}.jpg" alt=""><div class="t"><b>${esc(p.name)}</b><span>${esc(S(it.sid).name)}</span><i class="num">${rub(p.price)}</i></div></button>`; }).join('')}</div>
-    </div>` : ''}
+    </div>
+    <button class="btn block" data-act="openlook" data-id="${look.id}">Посмотреть образ и маршрут →</button>` : ''}
+    ${st.recent.length > 1 ? `<h2 class="h2">Вы смотрели</h2><div class="hscroll">${st.recent.slice(0, 8).map(id => pcard(P(id))).join('')}</div>` : ''}
 
     <div class="ai"><div class="txt"><h3>Примерь стиль с ИИ-стилистом</h3><p>Загрузи фото или опиши, что тебе нравится</p><button class="btn sm" style="align-self:flex-start" data-act="stylist">Попробовать →</button></div><img src="img/selfie.jpg" alt=""></div>
 
@@ -631,9 +700,13 @@ VIEWS.catalog = ({q = ''}) => {
   const t = q.toLowerCase().trim();
   const ai = t ? aiState('search' + t) : null;
   const aiIds = ai?.data && Array.isArray(ai.data.ids) ? ai.data.ids.map(String).filter(P) : null;
-  const list = aiIds ? [...new Set(aiIds)].map(P) : PRODUCTS.filter(p => !t || (p.name + ' ' + CATS[p.cat] + ' ' + p.tags.join(' ') + ' ' + p.tone + ' ' + p.color + ' ' + p.material + ' ' + p.season + ' ' + Object.keys(p.stock).map(id => S(id).name).join(' ')).toLowerCase().includes(t));
-  return `<div class="scr">${backBtn(aiIds ? aiTag : '')}
-    <h1 class="h1">${t ? 'Поиск: ' + esc(q) : 'Все вещи'}</h1>
+  const list = (aiIds ? [...new Set(aiIds)].map(P) : PRODUCTS.filter(p => !t || (p.name + ' ' + CATS[p.cat] + ' ' + p.tags.join(' ') + ' ' + p.tone + ' ' + p.color + ' ' + p.material + ' ' + p.season + ' ' + Object.keys(p.stock).map(id => S(id).name).join(' ')).toLowerCase().includes(t)))
+    .filter(p => (ui.chip === 'all' || p.cat === ui.chip) && (!ui.feat.size || where(p).length));
+  return `<div class="scr">${ui.stack.length ? backBtn(aiIds ? aiTag : '') : ''}
+    <h1 class="h1">${t ? 'Поиск: ' + esc(q) : 'Каталог'}</h1>
+    ${t ? '' : `<form class="search" id="searchForm">${ICON.search}<input id="q" placeholder="Найти вещь, бренд или стиль" autocomplete="off"></form>`}
+    <div class="chips">${[['all','Всё'], ...Object.entries(CATS)].map(([k, n]) => `<button class="chip ${ui.chip===k?'on':''}" data-chip="${k}">${n}</button>`).join('')}</div>
+    <label class="check"><input type="checkbox" data-act="sizeonly" ${ui.feat.size ? 'checked' : ''}> Только то, что есть в моём размере (${esc(st.profile.size)}, обувь ${esc(st.profile.shoe)})</label>
     ${ai?.wait ? '<p class="note">ИИ разбирает запрос по смыслу… пока показываем совпадения по словам</p>' : ''}${ai?.err ? `<p class="note">${esc(ai.err)}. Показываем совпадения по словам</p>` : ''}${aiIds && ai.data.note ? `<p class="note">${esc(ai.data.note)}</p>` : ''}
     <p class="sub">${list.length} ${list.length === 1 ? 'вещь' : 'вещей'} в ${STORES.length} магазинах-партнёрах · ${aiIds ? 'по релевантности' : 'сначала то, что есть в вашем размере'}</p>
     ${!list.length ? `<div class="empty"><img src="img/otter.jpg" alt=""><b>Пока такого нет ни в одном магазине-партнёре</b><p>Мы записали запрос. Магазины видят, что вы ищете, и могут это завезти. Когда появится — пришлём уведомление.</p><button class="btn" data-act="stylist">Спросить ИИ-стилиста</button></div>` : ''}
@@ -663,6 +736,9 @@ VIEWS.product = ({id}) => {
       <div class="sub">${kmTxt(km(r.s))} · ${walk(km(r.s))} · ${r.q > 0 ? (r.q === 1 ? 'последняя штука' : r.q + ' шт.') : 'есть: ' + Object.entries(r.all).filter(([, q]) => q > 0).map(([s]) => s).join(', ')}</div>
       <div style="grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><span class="pill ${f.cls}">${f.t}</span><button class="link" style="font-size:12px" data-act="report" data-sid="${r.s.id}" data-id="${p.id}">Вещи не оказалось?</button></div>
     </div>`; }).join('')}</div>
+    ${rows.every(r => r.q < 1) ? (st.subs.some(x => x.pid === p.id && x.sz === sz)
+      ? `<div class="panel"><b>Вы подписаны на поступление размера ${esc(sz)}</b><span class="sub">Пришлём уведомление, как только магазин его завезёт.</span><button class="btn sm ghost" style="align-self:flex-start" data-act="unsub" data-id="${p.id}" data-sz="${esc(sz)}">Отписаться</button></div>`
+      : `<button class="btn block" data-act="sub" data-id="${p.id}" data-sz="${esc(sz)}">${ICON.bell.replace('<svg', '<svg width="18" height="18"')} Сообщить о поступлении ${p.cat === 'bag' ? '' : 'размера ' + esc(sz)}</button>`) : ''}
     <p class="note">Бронь держится 24 часа и бесплатна. Оплата — в магазине после примерки. Не подошло — просто не покупайте.</p>
     ${SC && cobuyFor(p.id).length ? `<h2 class="h2">С этим берут</h2><div class="grid2">${cobuyFor(p.id).slice(0, 2).map(x => pcard(x)).join('')}</div><p class="note">По 734 тыс. корзин H&M: модель item2vec, вещи из других категорий, которые есть в наличии.</p>` : ''}
     <button class="btn ghost block" data-act="stylistWith" data-id="${p.id}">${ICON.spark.replace('<svg','<svg width="18" height="18"')} Собрать образ с этой вещью</button>
@@ -776,86 +852,232 @@ VIEWS.fav = () => {
   return `<div class="scr"><h1 class="h1">Избранное</h1>
   ${list.length ? `<div class="grid2">${list.map(p => pcard(p)).join('')}</div><button class="btn ghost block" data-act="stylist">Собрать образ из избранного</button>` : `<div class="empty"><img src="img/otter.jpg" alt=""><b>Пока пусто</b><p>Нажимайте на сердечко у вещей, и мы сообщим, если размер закончится.</p></div>`}</div>`;
 };
+const BK_LABEL = {active:['ok','ждёт вас'], done:['n','выкуплено'], cancel:['bad','отменена'], expired:['warn','срок истёк']};
+function bkCard(b){
+  const p = P(b.pid), s = S(b.sid), [c, t] = BK_LABEL[bkStatus(b)];
+  return `<div class="icard">
+    <div class="h"><img src="img/${p.img}.jpg" alt=""><div class="t"><b>${esc(p.name)}${b.sz !== 'one' ? ', ' + esc(b.sz) : ''}</b><span class="sub">${esc(s.name)} · ${esc(s.branch)} · ${s.hours}</span></div><b class="num">${rub(p.price)}</b></div>
+    <div class="between"><span class="num" style="font-weight:800">${b.code}</span><span class="pill ${c}">${b.status === 'active' ? leftTxt(b) : t}</span></div>
+    ${b.status === 'active' ? `<div class="row"><button class="btn sm" style="flex:1" data-act="showbk" data-id="${b.id}">Показать QR</button><button class="btn sm ghost" style="flex:1" data-act="storepage" data-id="${s.id}">${ICON.pin} Магазин</button></div>
+      <button class="link" style="font-size:12px;align-self:flex-start" data-act="cancelbk" data-id="${b.id}">Отменить бронь</button>` : `<button class="link" style="font-size:12px;align-self:flex-start" data-act="product" data-id="${p.id}">Открыть вещь ›</button>`}
+  </div>`;
+}
+VIEWS.bookings = () => {
+  const mine = st.bookings.filter(b => !b.seed).slice().reverse();
+  const act = mine.filter(b => bkStatus(b) === 'active'), old = mine.filter(b => b.status !== 'active');
+  return `<div class="scr"><h1 class="h1">Брони</h1>
+    ${act.length ? `<p class="sub">Покажите QR-код на кассе. Оплата после примерки, бронь бесплатна.</p><div class="col">${act.map(bkCard).join('')}</div>`
+      : `<div class="empty"><img src="img/otter.jpg" alt=""><b>Активных броней нет</b><p>Забронируйте вещь в карточке товара: магазин отложит её на 24 часа, а вы спокойно придёте примерить.</p><button class="btn" data-tab="catalog">В каталог</button></div>`}
+    ${old.length ? `<h2 class="h2">История</h2><div class="col">${old.map(bkCard).join('')}</div>` : ''}
+  </div>`;
+};
+VIEWS.notes = () => {
+  st.notes.forEach(n => n.read = true); save();
+  return `<div class="scr">${backBtn()}<h1 class="h1">Уведомления</h1>
+    ${st.notes.length ? `<div class="menu">${st.notes.map(n => `<div style="padding:14px 16px;border-bottom:1px solid var(--line)"><div style="font-size:14px">${esc(n.t)}</div><span class="note">${new Date(n.at).toLocaleString('ru-RU', {day:'numeric', month:'long', hour:'2-digit', minute:'2-digit'})}</span></div>`).join('')}</div>`
+      : '<div class="empty"><img src="img/otter.jpg" alt=""><b>Уведомлений пока нет</b><p>Здесь появятся статусы броней и поступления вещей, на которые вы подписались.</p></div>'}
+    <button class="link" data-act="noteprefs">Настроить уведомления ›</button>
+  </div>`;
+};
+VIEWS.subs = () => `<div class="scr">${backBtn()}<h1 class="h1">Жду поступления</h1>
+  <p class="sub">Сообщим, когда нужный размер появится хотя бы в одном магазине.</p>
+  ${st.subs.length ? `<div class="col">${st.subs.map(x => { const p = P(x.pid), ok = where(p, x.sz).length; return `<div class="litem"><button data-act="product" data-id="${p.id}"><img src="img/${p.img}.jpg" alt=""></button><div class="t"><b>${esc(p.name)}</b><span class="sub">${x.sz === 'one' ? '' : 'размер ' + esc(x.sz)}</span><span class="pill ${ok ? 'ok' : 'n'}" style="align-self:flex-start">${ok ? 'появилось!' : 'пока нет'}</span></div><div class="act"><button class="link" style="font-size:12px" data-act="unsub" data-id="${p.id}" data-sz="${esc(x.sz)}">Убрать</button></div></div>`; }).join('')}</div>`
+    : '<div class="empty"><img src="img/otter.jpg" alt=""><b>Подписок нет</b><p>Если вашего размера нет ни в одном магазине, в карточке вещи нажмите «Сообщить о поступлении».</p></div>'}
+</div>`;
+const FAQ = [
+  ['Как работает бронь?', 'Магазин откладывает вещь на 24 часа. Покажите QR-код или назовите код на кассе, примерьте и оплатите только то, что подошло. Бронь бесплатна.'],
+  ['Что если вещи не оказалось в магазине?', 'Нажмите «Вещи не оказалось?» в карточке. Мы передадим жалобу магазину, а магазины с частыми жалобами опускаются в выдаче, пока не обновят остатки.'],
+  ['Почему у магазина пометка «уточните по телефону»?', 'Остатки этого магазина давно не обновлялись. Чем свежее данные, тем выше магазин в подборках.'],
+  ['Можно ли забронировать два размера?', 'Да. Забронируйте оба, примерьте и выкупите тот, что подошёл. Второй магазин вернёт в продажу.'],
+  ['Как ИИ-стилист выбирает вещи?', 'Только из того, что сейчас есть в магазинах в вашем размере. Модели работают прямо в телефоне, фото никуда не отправляются.'],
+];
+VIEWS.help = () => `<div class="scr">${backBtn()}<h1 class="h1">Помощь</h1>
+  <div class="col">${FAQ.map(([q, a]) => `<details class="faq"><summary>${q}</summary><p>${a}</p></details>`).join('')}</div>
+  <div class="panel"><b>Не нашли ответ?</b><span class="sub">Напишите в поддержку: support@vydrochka.ru (демо-адрес). Отвечаем с 9 до 21.</span></div>
+</div>`;
+VIEWS.noteprefs = () => `<div class="scr">${backBtn()}<h1 class="h1">Уведомления</h1>
+  <div class="menu">
+    <label><span class="grow">Статусы броней<br><span class="note">создана, скоро истекает, выкуплена</span></span><input type="checkbox" data-pref="bk" ${st.prefs.bk ? 'checked' : ''}></label>
+    <label><span class="grow">Поступление вещей<br><span class="note">по вашим подпискам</span></span><input type="checkbox" data-pref="stock" ${st.prefs.stock ? 'checked' : ''}></label>
+    <label><span class="grow">Акции магазинов<br><span class="note">рекламные рассылки, только с вашего согласия</span></span><input type="checkbox" data-pref="promo" ${st.prefs.promo ? 'checked' : ''}></label>
+  </div>
+</div>`;
 VIEWS.profile = () => {
-  const mine = st.bookings.filter(b => !b.seed);
-  const pr = st.profile;
-  const stLabel = {active:['ok','действует'], done:['n','выдано'], cancel:['bad','отменена']};
+  const pr = st.profile, mine = st.bookings.filter(b => !b.seed);
+  const act = mine.filter(b => bkStatus(b) === 'active').length, bought = mine.filter(b => b.status === 'done');
+  const tile = (act_, ic, label, n) => `<button ${act_}>${ic}<b class="num">${n}</b>${label}</button>`;
   return `<div class="scr"><h1 class="h1">Профиль</h1>
-    <div class="panel"><div class="between"><b>Мои параметры</b><button class="link" data-act="editprofile">Изменить</button></div>
-      <span class="sub">${esc(pr.city)} · одежда ${esc(pr.size)} · обувь ${esc(pr.shoe)} · стиль «${esc(pr.style)}» · бюджет до ${rub(+pr.budget)}</span></div>
-    <h2 class="h2">Мои брони</h2>
-    ${mine.length ? mine.slice().reverse().map(b => { const p = P(b.pid), s = S(b.sid), [c, t] = stLabel[b.status]; return `<div class="litem">
-      <img src="img/${p.img}.jpg" alt=""><div class="t"><b>${esc(p.name)}</b><span class="sub">${esc(s.name)} · ${esc(s.branch)}</span><span class="num" style="font-weight:800">${b.code}</span></div>
-      <div class="act"><span class="pill ${c}">${t}</span>${b.status === 'active' ? `<button class="btn sm ghost" data-act="showbk" data-id="${b.id}">QR</button><button class="link" style="font-size:12px" data-act="cancelbk" data-id="${b.id}">Отменить</button>` : ''}</div></div>`; }).join('')
-    : '<p class="sub">Броней пока нет.</p>'}
-    <h2 class="h2">Для бизнеса</h2>
-    <button class="store" data-act="tostore"><img src="img/store2.jpg" alt=""><div class="t"><b>Кабинет магазина</b><span class="sub">Каталог, остатки, брони, спрос в городе</span></div></button>
-    <a class="btn ghost block" href="docs.html" target="_blank" rel="noopener">О проекте и документация</a>
+    <div class="tiles">
+      ${tile('data-tab="bookings"', ICON.ticket, 'Брони', act)}
+      ${tile('data-act="favs"', ICON.heart, 'Избранное', st.fav.length)}
+      ${tile('data-tab="looks"', ICON.hanger, 'Образы', st.looks.length)}
+      ${tile('data-act="subs"', ICON.bell, 'Жду', st.subs.length)}
+    </div>
+    <div class="panel"><div class="between"><b>Мои размеры и стиль</b><button class="link" data-act="editprofile">Изменить</button></div>
+      <div class="row" style="flex-wrap:wrap"><span class="pill n">одежда ${esc(pr.size)}</span><span class="pill n">обувь ${esc(pr.shoe)}</span><span class="pill n">${esc(pr.style)}</span><span class="pill n">до ${rub(+pr.budget)}</span></div>
+      <span class="note">По размерам мы показываем только то, что вам подойдёт, и подсказываем, если вещь маломерит.</span></div>
+    ${bought.length ? `<div class="panel"><b>Выкуплено через Выдрочку</b><span class="sub">${bought.length} ${bought.length === 1 ? 'вещь' : 'вещи'} на ${rub(bought.reduce((s, b) => s + P(b.pid).price, 0))}</span></div>` : ''}
+    <div class="menu">
+      <button data-act="notes"><span class="grow">Уведомления</span>${st.notes.some(n => !n.read) ? '<span class="pill bad">новые</span>' : ''}<span>›</span></button>
+      <button data-act="noteprefs"><span class="grow">Настройки уведомлений</span><span>›</span></button>
+      <button data-act="map"><span class="grow">Магазины-партнёры на карте</span><span>›</span></button>
+      <button data-act="editprofile"><span class="grow">Город: ${esc(pr.city)}</span><span>›</span></button>
+      <button data-act="help"><span class="grow">Помощь и частые вопросы</span><span>›</span></button>
+      <a href="docs.html" target="_blank" rel="noopener"><span class="grow">О сервисе</span><span>›</span></a>
+    </div>
+    <div class="menu"><button data-act="wipe"><span class="grow" style="color:var(--bad)">Удалить мои данные</span></button></div>
+    <p class="note" style="text-align:center">Вы магазин? <button class="link" style="font-size:12px;text-decoration:underline" data-act="tostore">Кабинет партнёра</button></p>
   </div>`;
 };
 
 /* ================= КАБИНЕТ МАГАЗИНА ================= */
-function storeStats(sid){
-  const live = st.stats[sid] || {};
-  const bk = st.bookings.filter(b => b.sid === sid);
-  return {views:SEED_STATS.views + (live.views || 0), cards:SEED_STATS.cards + (live.cards || 0), routes:SEED_STATS.routes + (live.routes || 0),
-    bookings:SEED_STATS.bookings + bk.filter(b => !b.seed).length, visits:SEED_STATS.visits + bk.filter(b => !b.seed && b.status === 'done').length};
+const myStores = () => STORES.filter(s => s.name === st.auth?.brand);
+const CAB_TABS = [['sum','Сводка',ICON.chart],['bk','Брони',ICON.ticket],['inv','Товары',ICON.box],['demand','Спрос',ICON.search],['more','Ещё',ICON.more]];
+const CAB_TITLE = {sum:'Сводка', bk:'Брони', inv:'Товары и остатки', demand:'Спрос в городе', more:'Магазин и тариф'};
+/* Демо-история за 180 дней: детерминированная по магазину, чтобы цифры не прыгали при перезагрузке */
+function rnd(seed){ let h = 2166136261; for (const c of seed) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return () => { h = Math.imul(h ^ h >>> 15, 2246822507); h = Math.imul(h ^ h >>> 13, 3266489909); return ((h ^= h >>> 16) >>> 0) / 4294967296; }; }
+const SERIES = {};
+function series(sid){
+  if (SERIES[sid]) return SERIES[sid];
+  const r = rnd(sid), base = {stil1:1, stil2:.6, moda:.9, obuv:.5, trendy:.8, base:.4}[sid] || .6, out = [];
+  for (let i = 0; i < 180; i++){
+    const d = new Date(Date.now() - (179 - i) * 864e5), v = base * ([0, 6].includes(d.getDay()) ? 1.35 : 1) * (0.7 + r() * 0.6) * (0.8 + i / 450);
+    const bookings = Math.round(1.6 * v * (0.5 + r()));
+    out.push({d, views:Math.round(48 * v), cards:Math.round(15 * v), bookings, visits:Math.round(bookings * (0.55 + r() * 0.3))});
+  }
+  return SERIES[sid] = out;
+}
+function periodStats(sid, n){
+  const s = series(sid), cur = s.slice(-n), prev = s.slice(-2 * n, -n), sum = (a, k) => a.reduce((x, y) => x + y[k], 0);
+  const live = st.stats[sid] || {}, bk = st.bookings.filter(b => b.sid === sid && !b.seed);
+  return {days:cur,
+    k:{views:sum(cur, 'views') + (live.views || 0), cards:sum(cur, 'cards') + (live.cards || 0), bookings:sum(cur, 'bookings') + bk.length, visits:sum(cur, 'visits') + bk.filter(b => b.status === 'done').length},
+    p:{views:sum(prev, 'views'), cards:sum(prev, 'cards'), bookings:sum(prev, 'bookings'), visits:sum(prev, 'visits')}};
+}
+const AVG_CHECK = 5400;
+const delta = (a, b) => { if (!b) return ''; const d = Math.round((a - b) / b * 100); return `<span class="d ${d >= 0 ? 'up' : 'dn'}">${d >= 0 ? '▲' : '▼'} ${Math.abs(d)}% к прошлому периоду</span>`; };
+const BENCH = {cards:.30, bookings:.10, visits:.70};
+const HINT = {
+  cards:'Карточки открывают реже, чем у похожих магазинов рядом. Добавьте фото на светлом фоне и все размеры: полные карточки чаще попадают в подборки стилиста.',
+  bookings:'Карточки смотрят, но бронируют мало. Проверьте, что ходовые размеры (S–M, 37–38) в наличии и цены актуальны.',
+  visits:'Бронируют, но не доходят до кассы. Чаще обновляйте остатки и выдавайте брони по коду: так меньше отказов «вещи нет».',
+};
+const lowStock = s => PRODUCTS.filter(p => st.inv[p.id][s.id] && sizesOf(p).some(z => qty(p.id, s.id, z) <= 1 && (p.stock[s.id][z] || 0) > 0));
+const SEED_WAIT = [{pid:'p4', sz:'XS', n:4}, {pid:'p7', sz:'XL', n:3}, {pid:'p9', sz:'40', n:5}, {pid:'p3', sz:'XS', n:2}, {pid:'p2', sz:'L', n:3}];
+const waitFor = s => [...SEED_WAIT.filter(w => st.inv[w.pid][s.id]), ...st.subs.filter(x => st.inv[x.pid][s.id] && !qty(x.pid, s.id, x.sz)).map(x => ({...x, n:1, live:true}))];
+
+function vLogin(){
+  const lg = ui.login || {};
+  return `<div class="login">
+    <div><button class="back" data-act="tobuyer">${ICON.back}<span>В приложение покупателя</span></button></div>
+    <div class="row"><img src="img/logo.jpg" alt="" style="width:52px;height:52px;border-radius:14px;mix-blend-mode:multiply"><div><h1 class="h1" style="font-size:24px">Выдрочка для бизнеса</h1><span class="sub">Кабинет магазина-партнёра</span></div></div>
+    <form id="loginForm" class="col">
+      <div class="field"><label for="lg-phone">Телефон владельца или администратора</label><input id="lg-phone" type="tel" inputmode="tel" value="${esc(lg.phone || '')}" placeholder="+7 900 000-00-01" autocomplete="off" ${lg.sent ? 'readonly' : ''}></div>
+      ${lg.sent ? `<div class="field"><label for="lg-code">Код из SMS</label><input id="lg-code" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="one-time-code"></div>
+        <button class="btn block" type="submit">Войти</button><button type="button" class="link" data-act="lgreset">Изменить номер</button>`
+      : '<button class="btn block" type="submit">Получить код</button>'}
+    </form>
+    <div class="panel"><b>Демо-доступ</b><span class="sub">Это прототип: SMS не отправляется, код всегда <b class="num">${DEMO_CODE}</b>. Нажмите на магазин, чтобы подставить его номер.</span>
+      <div class="row" style="flex-wrap:wrap">${ACCOUNTS.map(a => `<button class="chip" style="height:36px;padding:0 14px" data-act="lgfill" data-id="${esc(a.phone)}">${esc(a.brand)}</button>`).join('')}</div></div>
+    <p class="note">Хотите подключить магазин? partners@vydrochka.ru (демо-адрес). Пилот бесплатный 3 месяца.</p>
+  </div>`;
 }
 function vCabinet(){
-  const sid = ui.cabStore, s = S(sid);
-  const tabs = [['sum','Сводка'],['bk','Брони'],['inv','Товары и остатки'],['demand','Спрос в городе'],['plan','Тариф и API']];
+  const mine = myStores();
+  if (!mine.length){ st.auth = null; save(); return vLogin(); }
+  if (!mine.some(x => x.id === ui.cabStore)) ui.cabStore = mine[0].id;
+  if (!CAB[ui.cabTab]) ui.cabTab = 'sum';
+  const s = S(ui.cabStore);
   return `<div class="cab">
     <nav>
-      <div class="brand"><img src="img/logo.jpg" alt=""><div><b>Выдрочка</b><small style="color:rgba(247,243,239,.6)">кабинет магазина</small></div></div>
-      <label class="sub" for="cabStore" style="color:rgba(247,243,239,.6);margin-top:8px">Магазин</label>
-      <select id="cabStore">${STORES.map(x => `<option value="${x.id}" ${x.id === sid ? 'selected' : ''}>${esc(x.name)} · ${esc(x.branch)}</option>`).join('')}</select>
-      ${tabs.map(([k, t]) => `<button class="${ui.cabTab === k ? 'on' : ''}" data-cab="${k}">${t}</button>`).join('')}
+      <div class="brand"><img src="img/logo.jpg" alt=""><div><b>${esc(st.auth.brand)}</b><small style="color:rgba(247,243,239,.6)">кабинет партнёра</small></div></div>
+      ${CAB_TABS.map(([k]) => `<button class="${ui.cabTab === k ? 'on' : ''}" data-cab="${k}">${CAB_TITLE[k]}</button>`).join('')}
       <div class="sp"></div>
-      <button data-act="tobuyer">← Приложение покупателя</button>
+      <button data-act="logout">Выйти</button>
     </nav>
-    <main>${CAB[ui.cabTab](s)}</main>
+    <main>
+      <div class="cabhead"><div class="t"><h1 class="h1" style="font-size:24px">${CAB_TITLE[ui.cabTab]}</h1><span class="sub">${esc(st.auth.brand)}${mine.length > 1 ? '' : ' · ' + esc(s.branch)}</span></div>
+        ${mine.length > 1 ? `<select id="cabStore" aria-label="Точка">${mine.map(x => `<option value="${x.id}" ${x.id === s.id ? 'selected' : ''}>${esc(x.branch)}</option>`).join('')}</select>` : ''}</div>
+      ${CAB[ui.cabTab](s)}
+    </main>
   </div>`;
 }
 const CAB = {};
 CAB.sum = s => {
-  const k = storeStats(s.id), f = fresh_(s);
-  const fun = [['Показы в подборках', k.views], ['Открыли карточку', k.cards], ['Построили маршрут', k.routes], ['Забронировали', k.bookings], ['Пришли и купили', k.visits]];
-  return `<div class="between" style="flex-wrap:wrap"><div><h1 class="h1" style="font-size:26px">${esc(s.name)} · ${esc(s.branch)}</h1><p class="sub">Последние 30 дней · <span class="demo">демо-данные</span></p></div><span class="pill ${f.cls}">${esc(s.sync)}: ${f.t}</span></div>
+  const n = ui.period, {k, p, days} = periodStats(s.id, n), f = fresh_(s);
+  const conv = k.bookings ? Math.round(k.visits / k.bookings * 100) : 0, pconv = p.bookings ? Math.round(p.visits / p.bookings * 100) : 0;
+  const steps = [['views','Увидели в поиске и подборках'], ['cards','Открыли карточку'], ['bookings','Забронировали'], ['visits','Пришли и купили']];
+  let worst = null, gap = 0;
+  steps.slice(1).forEach(([key], i) => { const r = k[key] / (k[steps[i][0]] || 1), g = BENCH[key] - r; if (g > gap){ gap = g; worst = key; } });
+  const groups = n > 30 ? Array.from({length:Math.ceil(days.length / 7)}, (_, i) => days.slice(i * 7, i * 7 + 7)) : days.map(d => [d]);
+  const vals = groups.map(g => g.reduce((a, d) => a + d.visits, 0)), max = Math.max(...vals, 1);
+  const fmt = d => d.toLocaleDateString('ru-RU', {day:'numeric', month:'short'});
+  const act = st.bookings.filter(b => b.sid === s.id && bkStatus(b) === 'active').length;
+  const low = lowStock(s), wait = waitFor(s), rep = st.reports[s.id] || 0;
+  const todo = [
+    act && ['bk', 'warn', `Покупатели ждут: ${act} ${act === 1 ? 'бронь' : 'брони'}`, 'Вещи отложены на 24 часа. Выдайте по коду, когда покупатель придёт'],
+    f.cls === 'warn' && ['inv', 'bad', 'Остатки устарели', 'Магазин опущен в выдаче, покупатели видят «уточните по телефону». Подключите кассу или загрузите файл'],
+    rep && ['inv', 'bad', `Жалобы «вещи не оказалось»: ${rep}`, 'Проверьте остатки. При трёх жалобах за неделю магазин опускается в выдаче'],
+    low.length && ['inv', 'warn', `Заканчивается: ${low.length} ${low.length === 1 ? 'товар' : 'товара'}`, low.slice(0, 2).map(x => x.name).join(', ')],
+    wait.length && ['demand', 'ok', `Лист ожидания: ${wait.reduce((a, w) => a + w.n, 0)} покупателей`, 'Ждут размеры, которых у вас нет. Завезите, и мы сразу им сообщим'],
+  ].filter(Boolean);
+  const top = PRODUCTS.filter(x => st.inv[x.id][s.id]).map(x => { const r = rnd(s.id + x.id); return {p:x, v:Math.round(k.views / 6 * (0.4 + r())), b:Math.round(k.bookings / 6 * (0.3 + r())) + st.bookings.filter(b => b.sid === s.id && b.pid === x.id && !b.seed).length, left:sizesOf(x).reduce((a, z) => a + qty(x.id, s.id, z), 0)}; }).sort((a, b) => b.v - a.v);
+  const lost = {expired:st.bookings.filter(b => b.sid === s.id && bkStatus(b) === 'expired').length, cancel:st.bookings.filter(b => b.sid === s.id && b.status === 'cancel').length};
+  return `<div class="between" style="flex-wrap:wrap;gap:8px"><div class="seg" style="flex:1;max-width:320px">${[7, 30, 90].map(d => `<button data-act="period" data-id="${d}" class="${n === d ? 'on' : ''}">${d} дней</button>`).join('')}</div><span class="demo">демо-данные</span></div>
+    ${todo.length ? `<div class="panel"><b>Что сделать сейчас</b><div class="col" style="gap:8px">${todo.map(([cab, c, t, d]) => `<button class="todo" data-cab="${cab}"><span class="dot" style="background:var(--${c})"></span><span class="t"><b>${t}</b>${esc(d)}</span><span>›</span></button>`).join('')}</div></div>` : ''}
     <div class="kpis">
-      <div class="kpi"><span>Покупателей пришло</span><b class="num">${k.visits}</b><span>подтверждено кодом</span></div>
-      <div class="kpi"><span>Конверсия брони в визит</span><b class="num">${Math.round(k.visits / k.bookings * 100)}%</b><span>${k.visits} из ${k.bookings}</span></div>
-      <div class="kpi"><span>Продано через приложение</span><b class="num">${rub(k.visits * 5400)}</b><span>средний чек 5 400 ₽</span></div>
-      <div class="kpi"><span>Стоимость визита</span><b class="num">0 ₽</b><span>пилот бесплатный</span></div>
+      <div class="kpi"><span>Выручка через сервис</span><b class="num">${rub(k.visits * AVG_CHECK)}</b>${delta(k.visits, p.visits)}</div>
+      <div class="kpi"><span>Пришли покупатели</span><b class="num">${k.visits}</b>${delta(k.visits, p.visits)}</div>
+      <div class="kpi"><span>Брони</span><b class="num">${k.bookings}</b>${delta(k.bookings, p.bookings)}</div>
+      <div class="kpi"><span>Бронь → визит</span><b class="num">${conv}%</b>${pconv ? `<span class="d ${conv >= pconv ? 'up' : 'dn'}">${conv >= pconv ? '▲' : '▼'} ${Math.abs(conv - pconv)} п.п.</span>` : ''}</div>
     </div>
-    <div class="panel"><b>Путь покупателя до кассы</b><div class="funnel">${fun.map(([t, v]) => `<div class="fbar"><span>${t}</span><div class="tr"><i style="width:${Math.max(3, v / k.views * 100)}%"></i></div><b class="num">${v}</b></div>`).join('')}</div></div>
+    <div class="panel"><b>Путь покупателя: от поиска до кассы</b><span class="sub">Сколько людей прошли каждый шаг и какая доля перешла на следующий. Для сравнения — средняя доля у похожих магазинов в радиусе 2 км.</span>
+      <div class="funnel">${steps.map(([key, t], i) => { const r = i ? k[key] / (k[steps[i - 1][0]] || 1) : 0;
+        return `${i ? `<div class="step">${Math.round(r * 100)}% перешли дальше · у соседей ${Math.round(BENCH[key] * 100)}%${key === worst ? ' · <b style="color:var(--bad)">слабое место</b>' : ''}</div>` : ''}<div class="fbar"><span>${t}</span><b class="num">${k[key].toLocaleString('ru-RU')}</b><div class="tr"><i style="width:${Math.max(2, k[key] / k.views * 100)}%"></i></div></div>`; }).join('')}</div>
+      ${worst ? `<div class="todo" style="background:var(--card)"><span class="t"><b>Совет</b>${HINT[worst]}</span></div>` : ''}</div>
+    <div class="panel"><div class="between"><b>Визиты по ${n > 30 ? 'неделям' : 'дням'}</b><span class="sub">всего ${k.visits}</span></div>
+      <div class="bars">${groups.map((g, i) => `<i style="height:${vals[i] / max * 100}%" title="${fmt(g[0].d)}${g.length > 1 ? ' – ' + fmt(g[g.length - 1].d) : ''}: ${vals[i]} визитов"></i>`).join('')}</div>
+      <div class="between note"><span>${fmt(days[0].d)}</span><span>сегодня</span></div></div>
     <div class="cols2">
-      <div class="panel"><b>Что можно улучшить</b><ul style="margin:0;padding-left:18px;font-size:13px;color:var(--ink-2);display:flex;flex-direction:column;gap:6px">
-        <li>Размер M пиджака заканчивается: осталась ${qty('p4', s.id, 'M') || 0} шт.</li><li>${f.cls === 'warn' ? 'Остатки давно не обновлялись. Подключите кассу или загрузите свежий файл.' : 'Остатки обновляются автоматически, всё в порядке.'}</li>
-        <li>В городе ищут платья миди (23 запроса), а их нет ни у одного партнёра.</li></ul></div>
-      <div class="panel"><b>Жалобы «вещи не оказалось»</b><b class="num" style="font-size:28px">${st.reports[s.id] || 0}</b><span class="sub">Если жалоб больше трёх за неделю, магазин опускается в выдаче, пока не обновит остатки.</span></div>
+      <div class="panel"><b>Топ товаров</b><div class="col" style="gap:8px">${top.slice(0, 5).map(x => `<div class="row" style="gap:10px"><img src="img/${x.p.img}.jpg" alt="" style="width:40px;height:40px;object-fit:contain;background:var(--white);border-radius:10px"><div class="grow" style="min-width:0"><b style="font-size:13px">${esc(x.p.name)}</b><div class="note">${x.v} просмотров · ${x.b} броней · осталось ${x.left} шт.</div></div>${x.left <= 1 ? '<span class="pill warn">мало</span>' : ''}</div>`).join('')}</div></div>
+      <div class="panel"><b>Почему теряем брони</b><div class="col" style="gap:6px;font-size:13px">
+        <div class="between"><span>Не пришли за 24 часа</span><b class="num">${lost.expired}</b></div>
+        <div class="between"><span>Покупатель отменил</span><b class="num">${lost.cancel}</b></div>
+        <div class="between"><span>«Вещи не оказалось»</span><b class="num">${rep}</b></div></div>
+        <span class="note">Брони, которые не забрали, автоматически возвращаются в продажу.</span></div>
     </div>`;
 };
+function cabBkCard(b){
+  const p = P(b.pid), [c, t] = {active:['ok', leftTxt(b)], done:['n','выдано'], cancel:['bad','отменил покупатель'], expired:['warn','не пришёл']}[b.status];
+  return `<div class="icard">
+    <div class="h"><img src="img/${p.img}.jpg" alt=""><div class="t"><b>${esc(p.name)}</b><span class="sub">${b.sz === 'one' ? 'без размера' : 'размер ' + esc(b.sz)} · ${rub(p.price)}</span></div></div>
+    <div class="between"><span><b class="num">${b.code}</b>${b.seed ? ' <span class="demo">пример</span>' : ''}</span><span class="pill ${c}">${t}</span></div>
+    <span class="note">Создана ${new Date(b.created).toLocaleString('ru-RU', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'})}</span>
+    ${b.status === 'active' ? `<div class="row"><button class="btn sm" style="flex:1" data-act="issue" data-id="${b.id}">Выдать</button><button class="btn sm ghost" style="flex:1" data-act="noshow" data-id="${b.id}">Не пришёл</button></div>` : ''}
+  </div>`;
+}
 CAB.bk = s => {
-  const bk = st.bookings.filter(b => b.sid === s.id).slice().reverse();
-  const lbl = {active:['ok','ждёт покупателя'], done:['n','выдано'], cancel:['bad','отменена']};
-  return `<h1 class="h1" style="font-size:26px">Брони</h1>
-    <form id="issueForm" class="panel"><b>Выдать бронь</b><span class="sub">Отсканируйте QR-код покупателя или введите код. Так магазин и сервис узнают, что покупатель пришёл.</span>
-      <div class="row" style="flex-wrap:wrap"><input id="issueCode" class="field" style="height:48px;border-radius:var(--r-m);border:1px solid var(--line);padding:0 14px;flex:1;min-width:160px;background:var(--white)" placeholder="ВД-0000" autocomplete="off"><button class="btn" type="submit">Подтвердить визит</button></div></form>
-    <div class="tbl"><table><thead><tr><th>Код</th><th>Вещь</th><th>Размер</th><th>Создана</th><th>Статус</th><th></th></tr></thead><tbody>
-    ${bk.length ? bk.map(b => { const [c, t] = lbl[b.status]; return `<tr><td class="num"><b>${b.code}</b>${b.seed ? ' <span class="demo">пример</span>' : ''}</td><td>${esc(P(b.pid).name)}</td><td>${b.sz === 'one' ? '—' : esc(b.sz)}</td><td class="num">${new Date(b.created).toLocaleString('ru-RU', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'})}</td><td><span class="pill ${c}">${t}</span></td><td>${b.status === 'active' ? `<button class="btn sm" data-act="issue" data-id="${b.id}">Выдать</button>` : ''}</td></tr>`; }).join('') : '<tr><td colspan="6">Броней нет. Забронируйте вещь этого магазина в приложении покупателя, и она появится здесь.</td></tr>'}
-    </tbody></table></div>`;
+  const all = st.bookings.filter(b => b.sid === s.id).slice().reverse(); all.forEach(bkStatus);
+  const F = [['active','Ждут'], ['done','Выданы'], ['expired','Не пришли'], ['cancel','Отмены']];
+  const list = all.filter(b => b.status === ui.bkFilter);
+  return `<form id="issueForm" class="panel"><b>Выдать бронь по коду</b><span class="sub">Попросите покупателя показать QR-код или назвать код брони.</span>
+      <div class="row"><input id="issueCode" style="height:48px;border-radius:var(--r-m);border:1px solid var(--line);padding:0 14px;flex:1;min-width:0;background:var(--white)" placeholder="ВД-0000" autocomplete="off"><button class="btn" type="submit">Выдать</button></div></form>
+    <div class="seg">${F.map(([k, t]) => { const c = all.filter(b => b.status === k).length; return `<button data-act="bkf" data-id="${k}" class="${ui.bkFilter === k ? 'on' : ''}">${t}${c ? ' ' + c : ''}</button>`; }).join('')}</div>
+    ${list.length ? `<div class="cardlist">${list.map(cabBkCard).join('')}</div>` : `<p class="sub" style="text-align:center;padding:20px">${ui.bkFilter === 'active' ? 'Сейчас никто не ждёт. Новые брони появятся здесь.' : 'Здесь пока пусто.'}</p>`}`;
 };
 CAB.inv = s => {
-  const items = PRODUCTS.filter(p => st.inv[p.id][s.id]);
-  return `<div class="between" style="flex-wrap:wrap"><h1 class="h1" style="font-size:26px">Товары и остатки</h1><span class="pill ${fresh_(s).cls}">источник: ${esc(s.sync)}</span></div>
-    <div class="tbl"><table><thead><tr><th>Товар</th><th>Цена</th>${[...CLOTH_SIZES, ...SHOE_SIZES, 'one'].filter(z => items.some(p => sizesOf(p).includes(z))).map(z => `<th>${z === 'one' ? 'шт.' : z}</th>`).join('')}</tr></thead><tbody>
-    ${items.map(p => `<tr><td><b>${esc(p.name)}</b></td><td class="num">${rub(p.price)}</td>${[...CLOTH_SIZES, ...SHOE_SIZES, 'one'].filter(z => items.some(pp => sizesOf(pp).includes(z))).map(z => sizesOf(p).includes(z) ? `<td><input class="q num" type="number" min="0" value="${qty(p.id, s.id, z)}" data-inv="${p.id}|${s.id}|${z}" aria-label="${esc(p.name)} ${z}"></td>` : '<td></td>').join('')}</tr>`).join('')}
-    </tbody></table></div>
+  const items = PRODUCTS.filter(p => st.inv[p.id][s.id]), f = fresh_(s), low = lowStock(s);
+  return `<div class="panel"><div class="between" style="flex-wrap:wrap;gap:6px"><b>Источник: ${esc(s.sync)}</b><span class="pill ${f.cls}">${f.t}</span></div>
+      <span class="sub">${items.length} товаров в каталоге. Покупатели видят изменения сразу.${low.length ? ` Заканчивается: ${low.map(p => esc(p.name)).join(', ')}.` : ''}</span></div>
+    <div class="cardlist">${items.map(p => { const tot = sizesOf(p).reduce((a, z) => a + qty(p.id, s.id, z), 0); return `<div class="icard">
+      <div class="h"><img src="img/${p.img}.jpg" alt=""><div class="t"><b>${esc(p.name)}</b><span class="sub">${rub(p.price)} · всего ${tot} шт.</span></div>${tot === 0 ? '<span class="pill bad">нет</span>' : low.includes(p) ? '<span class="pill warn">мало</span>' : ''}</div>
+      <div class="qrow">${sizesOf(p).map(z => `<label>${z === 'one' ? 'шт.' : z}<input class="q num" type="number" min="0" inputmode="numeric" value="${qty(p.id, s.id, z)}" data-inv="${p.id}|${s.id}|${z}" aria-label="${esc(p.name)}, ${z === 'one' ? 'штук' : 'размер ' + z}"></label>`).join('')}</div>
+    </div>`; }).join('')}</div>
     <div class="cols2">
       <div class="panel"><b>Как подключить остатки</b><ul style="margin:0;padding-left:18px;font-size:13px;color:var(--ink-2);display:flex;flex-direction:column;gap:6px">
         <li><b>1С:Розница или МойСклад</b> — модуль выгрузки, остатки обновляются каждые 15 минут.</li>
         <li><b>Эвотор</b> — приложение из их маркета, продажи сразу списывают остаток.</li>
-        <li><b>Нет учётной системы</b> — Excel- или CSV-файл раз в день, либо правка прямо в этой таблице.</li></ul></div>
+        <li><b>Нет учётной системы</b> — CSV-файл раз в день или правка прямо здесь.</li></ul></div>
       <form class="panel" id="csvForm"><b>Загрузить файл с остатками</b><span class="sub">Формат строки: название;размер;количество</span>
         <pre class="json">Пиджак оверсайз;M;3
 Брюки широкие;S;1</pre>
@@ -871,23 +1093,32 @@ function cardPanel(){
     ${d ? `<div class="tbl"><table><tbody>${[['Название', d.name], ['Категория', CATS[d.cat] || d.cat], ['Тип', d.articleType], ['Цвет', d.color], ['Материал', d.material], ['Сезон', d.season], ['Теги', Array.isArray(d.tags) ? d.tags.join(', ') : d.tags], ['Цена', d.price_from ? `${rub(+d.price_from)} – ${rub(+d.price_to || +d.price_from)}` : ''], ['Описание', d.description]].filter(([, v]) => v).map(([k, v]) => `<tr><td class="sub">${k}</td><td>${esc(v)}</td></tr>`).join('')}</tbody></table></div><p class="note">Проверьте поля перед публикацией: в рабочей версии карточка уходит в каталог после подтверждения магазином.</p>` : ''}
     ${a?.wait ? '' : `<label class="btn ghost" for="cardPhoto" style="cursor:pointer;align-self:flex-start">${d ? 'Другое фото' : 'Загрузить фото товара'}</label>`}<input id="cardPhoto" type="file" accept="image/jpeg,image/png,image/webp" hidden></div>`;
 }
-CAB.demand = () => {
+CAB.demand = s => {
   const all = [...st.demand.map(d => ({...d, live:true})), ...SEED_DEMAND];
-  const max = Math.max(...all.map(d => d.n));
-  return `<h1 class="h1" style="font-size:26px">Что ищут в Тюмени и не находят</h1>
-    <p class="sub">Запросы покупателей, на которые ни у одного магазина-партнёра не нашлось вещей. Это подсказка, что завезти.</p>
-    <div class="panel"><div class="funnel">${all.map(d => `<div class="fbar"><span style="white-space:normal">${esc(d.q)}${d.live ? ' <span class="pill ok">новый</span>' : ''}</span><div class="tr"><i style="width:${Math.max(4, d.n / max * 100)}%"></i></div><b class="num">${d.n}</b></div>`).join('')}</div></div>
+  const max = Math.max(...all.map(d => d.n)), wait = waitFor(s);
+  return `<div class="panel"><b>Лист ожидания вашего магазина</b><span class="sub">Покупатели подписались на размеры, которых у вас сейчас нет. Как только вы внесёте остаток, они получат уведомление.</span>
+      ${wait.length ? `<div class="col" style="gap:8px">${wait.map(w => { const p = P(w.pid); return `<div class="row" style="gap:10px"><img src="img/${p.img}.jpg" alt="" style="width:40px;height:40px;object-fit:contain;background:var(--white);border-radius:10px"><div class="grow" style="min-width:0"><b style="font-size:13px">${esc(p.name)}</b><div class="note">размер ${esc(w.sz)}${w.live ? ' · <span class="pill ok">новая подписка</span>' : ''}</div></div><b class="num">${w.n} чел.</b></div>`; }).join('')}</div>` : '<p class="note">Пока никто не ждёт.</p>'}</div>
+    <div class="panel"><b>Что ищут в Тюмени и не находят</b><span class="sub">Запросы, на которые ни у одного магазина-партнёра не нашлось вещей. Подсказка, что завезти.</span>
+      <div class="funnel">${all.map(d => `<div class="fbar"><span style="white-space:normal">${esc(d.q)}${d.live ? ' <span class="pill ok">новый</span>' : ''}</span><b class="num">${d.n}</b><div class="tr"><i style="width:${Math.max(4, d.n / max * 100)}%"></i></div></div>`).join('')}</div></div>
     ${AI ? `<div class="panel"><div class="between" style="flex-wrap:wrap"><b>Что завезти: разбор от ИИ</b>${aiTag}</div><span class="sub">Сопоставляем ненайденные запросы, остатки магазина и то, что покупают вместе (модель по корзинам H&M).</span>${aiBox('demand')}${aiState('demand')?.wait ? '' : `<button class="btn sm" style="align-self:flex-start" data-act="aidemand">${aiState('demand') ? 'Разобрать заново' : 'Получить рекомендации'}</button>`}</div>` : ''}
-    <p class="note">Данные обезличены: магазин видит только формулировку запроса и сколько раз его задавали, но не видит, кто спрашивал. Подробный отчёт по району и сезону входит в платный тариф.</p>`;
+    <p class="note">Данные обезличены: магазин видит только формулировку запроса и сколько раз его задавали, но не видит, кто спрашивал.</p>`;
 };
-CAB.plan = s => `<h1 class="h1" style="font-size:26px">Тариф и API</h1>
+CAB.more = s => `<div class="panel"><div class="row" style="gap:12px"><img src="img/${s.photo}" alt="" style="width:72px;height:72px;object-fit:cover;border-radius:14px"><div><b>${esc(s.name)}</b><div class="sub">${esc(s.branch)}, Тюмень</div><div class="sub">Часы работы: ${s.hours}</div></div></div>
+    <span class="note">Так магазин выглядит в приложении покупателя. Изменить адрес и часы — через поддержку партнёров.</span></div>
+  <div class="menu">
+    <div style="padding:14px 16px;border-bottom:1px solid var(--line)"><span class="grow">Вход по номеру</span><div class="note">${esc(st.auth.phone || '')}</div></div>
+    <button data-act="tobuyer"><span class="grow">Открыть приложение покупателя</span><span>›</span></button>
+    <a href="docs.html" target="_blank" rel="noopener"><span class="grow">Документация для партнёров</span><span>›</span></a>
+    <button data-act="logout"><span class="grow" style="color:var(--bad)">Выйти из кабинета</span></button>
+  </div>
+  <h2 class="h2">Тариф</h2>
   <div class="tariffs">
     <div class="tariff cur"><span class="pill ok">подключён</span><b class="h2">Пилот</b><b class="num">0 ₽ · 3 месяца</b><ul><li>каталог и остатки</li><li>брони и выдача по коду</li><li>базовая статистика</li></ul></div>
     <div class="tariff"><span class="pill n">после пилота</span><b class="h2">Старт</b><b class="num">1 990 ₽/мес + 49 ₽ за визит</b><ul><li>всё из пилота</li><li>платим только за подтверждённых покупателей</li><li>отчёт «что ищут в городе»</li></ul></div>
     <div class="tariff"><span class="pill n">сети</span><b class="h2">Сеть</b><b class="num">от 9 900 ₽/мес</b><ul><li>несколько точек</li><li>интеграция с 1С</li><li>продвижение с пометкой «Реклама»</li></ul></div>
   </div>
   <p class="note">Цены — гипотеза. На пилоте проверяем, готовы ли магазины платить за визит, и только потом фиксируем тариф.</p>
-  <div class="panel"><b>Этап 3: наличие для ИИ-ассистентов</b><span class="sub">Через тот же поток данных магазин виден не только в нашем приложении, но и голосовым помощникам, картам и чат-ботам. Ответ сервиса выглядит так:</span>
+  <details class="faq"><summary>API наличия для ИИ-ассистентов (этап 3)</summary><p>Через тот же поток данных магазин виден не только в нашем приложении, но и голосовым помощникам, картам и чат-ботам. Ответ сервиса выглядит так:</p>
   <pre class="json">GET /v1/availability?city=tyumen&amp;q=пиджак&amp;size=M
 
 {
@@ -900,7 +1131,7 @@ CAB.plan = s => `<h1 class="h1" style="font-size:26px">Тариф и API</h1>
     "updated_min_ago": ${s.upd},
     "reserve_url": "https://vydrochka.ru/r/p4"
   }]
-}</pre><span class="note">Адрес и формат условные, в прототипе запрос не выполняется.</span></div>`;
+}</pre><p class="note">Адрес и формат условные, в прототипе запрос не выполняется.</p></details>`;
 
 /* ================= ДЕЙСТВИЯ ================= */
 function askStylist(text, q = parseQuery(text), silent = false){
@@ -951,8 +1182,22 @@ document.addEventListener('click', e => {
   const id = t.dataset.id, a = t.dataset.act;
   switch (a){
     case 'back': back(); break;
-    case 'menu': tab('profile'); break;
-    case 'product': { const p = P(id); stat(Object.keys(p.stock)[0], 'cards'); save(); go('product', {id}); break; }
+    case 'product': { const p = P(id); stat(Object.keys(p.stock)[0], 'cards'); st.recent = [id, ...st.recent.filter(x => x !== id)].slice(0, 10); save(); go('product', {id}); break; }
+    case 'favs': go('fav'); break;
+    case 'notes': go('notes'); break;
+    case 'subs': go('subs'); break;
+    case 'help': go('help'); break;
+    case 'noteprefs': go('noteprefs'); break;
+    case 'sizeonly': ui.feat.size = !ui.feat.size; render(); break;
+    case 'sub': if (!st.subs.some(x => x.pid === id && x.sz === t.dataset.sz)) st.subs.push({pid:id, sz:t.dataset.sz}); save(); toast(st.prefs.stock ? 'Сообщим, как только размер появится в магазине' : 'Подписались. Включите уведомления о поступлении в профиле'); render(); break;
+    case 'unsub': st.subs = st.subs.filter(x => !(x.pid === id && x.sz === t.dataset.sz)); save(); toast('Подписка удалена'); render(); break;
+    case 'wipe': if (confirm('Удалить анкету, брони, избранное и образы с этого устройства?')){ st = fresh(); save(); ui.stack = []; ui.tab = 'home'; render(true); toast('Данные удалены'); } break;
+    case 'period': ui.period = +id; render(); break;
+    case 'bkf': ui.bkFilter = id; render(); break;
+    case 'noshow': { const b = st.bookings.find(x => x.id === id); b.status = 'expired'; if (!b.seed) st.inv[b.pid][b.sid][b.sz]++; save(); toast('Отмечено. Вещь вернулась в продажу'); render(); break; }
+    case 'lgfill': ui.login = {phone:id}; render(); break;
+    case 'lgreset': ui.login = null; render(); break;
+    case 'logout': st.auth = null; ui.login = null; save(); render(true); toast('Вы вышли из кабинета'); break;
     case 'fav': st.fav = st.fav.includes(id) ? st.fav.filter(x => x !== id) : [...st.fav, id]; save(); toast(st.fav.includes(id) ? 'Добавили в избранное. Сообщим, если размер закончится' : 'Убрали из избранного'); render(); break;
     case 'pick': ui.pickSize = {...(ui.pickSize || {}), [id]:t.dataset.v}; render(); break;
     case 'stylist': ui.chat = []; go('stylist'); break;
@@ -979,10 +1224,11 @@ document.addEventListener('click', e => {
     }
     case 'savelook': { const look = findLook(id); if (!st.looks.some(l => l.id === id)) st.looks.unshift(look); save(); toast('Образ сохранён во вкладке «Образы»'); render(); break; }
     case 'route': findLook(id).items.forEach(i => stat(i.sid, 'routes')); save(); go('route', {id}); break;
-    case 'book': { const b = book(id, t.dataset.sid, t.dataset.sz); if (b){ save(); go('booking', {ids:[b.id]}); } break; }
+    case 'book': { const b = book(id, t.dataset.sid, t.dataset.sz); if (b){ note(`Бронь ${b.code}: ${P(b.pid).name} ждёт вас в «${S(b.sid).name}» 24 часа`); save(); go('booking', {ids:[b.id]}); } break; }
     case 'bookall': {
       const look = findLook(id); const ids = [];
       look.items.forEach(it => { const b = book(it.pid, it.sid, it.sz); if (b) ids.push(b.id); });
+      if (ids.length) note(`Забронировали образ: ${ids.length} вещи, брони действуют 24 часа`);
       if (!st.looks.some(l => l.id === id)) st.looks.unshift(look);
       save(); if (ids.length) go('booking', {ids}); break;
     }
@@ -990,14 +1236,14 @@ document.addEventListener('click', e => {
     case 'cancelbk': { const b = st.bookings.find(x => x.id === id); b.status = 'cancel'; st.inv[b.pid][b.sid][b.sz]++; save(); toast('Бронь отменена, вещь вернулась в продажу'); render(); break; }
     case 'report': st.reports[t.dataset.sid] = (st.reports[t.dataset.sid] || 0) + 1; save(); toast('Спасибо! Передали магазину, проверим остатки'); render(); break;
     case 'editprofile': go('onb'); break;
-    case 'tostore': ui.mode = 'store'; render(true); break;
-    case 'tobuyer': ui.mode = 'buyer'; render(true); break;
+    case 'tostore': location.hash = 'store'; break;
+    case 'tobuyer': location.hash = ''; break;
     case 'issue': issue(st.bookings.find(b => b.id === id)); break;
   }
 });
 function issue(b){
   if (!b || b.status !== 'active'){ toast('Такой действующей брони нет'); return; }
-  b.status = 'done'; save(); toast(`Визит подтверждён: ${b.code}. Покупатель пришёл через Выдрочку`); render();
+  b.status = 'done'; if (!b.seed) note(`Спасибо за покупку в «${S(b.sid).name}»! Бронь ${b.code} выдана`); save(); toast(`Визит подтверждён: ${b.code}. Покупатель пришёл через Выдрочку`); render();
 }
 document.addEventListener('submit', e => {
   e.preventDefault();
@@ -1016,11 +1262,21 @@ document.addEventListener('submit', e => {
     const code = $('#issueCode').value.trim().toUpperCase().replace(/^VD/, 'ВД').replace(/^ВД-?/, 'ВД-');
     issue(st.bookings.find(b => b.code === code && b.sid === ui.cabStore));
   }
+  if (f.id === 'loginForm'){
+    const digits = x => x.replace(/D/g, '').slice(-10), phone = $('#lg-phone').value, acc = ACCOUNTS.find(a => digits(a.phone) === digits(phone));
+    if (!ui.login?.sent){
+      if (!acc){ toast('Номер не найден среди партнёров. Выберите демо-магазин ниже'); return; }
+      ui.login = {phone:acc.phone, sent:true}; render(); toast(`Демо: SMS не отправляем, код ${DEMO_CODE}`); $('#lg-code')?.focus(); return;
+    }
+    if ($('#lg-code').value.trim() !== DEMO_CODE){ toast('Неверный код'); return; }
+    st.auth = {brand:acc.brand, phone:acc.phone}; ui.login = null; ui.cabTab = 'sum'; save(); render(true);
+  }
 });
 document.addEventListener('change', e => {
   const t = e.target;
   if (t.id === 'cabStore'){ ui.cabStore = t.value; render(); }
-  if (t.dataset.inv){ const [pid, sid, z] = t.dataset.inv.split('|'); st.inv[pid][sid][z] = Math.max(0, +t.value || 0); save(); toast('Остаток обновлён, покупатели видят его сразу'); }
+  if (t.dataset.pref){ st.prefs[t.dataset.pref] = t.checked; save(); }
+  if (t.dataset.inv){ const [pid, sid, z] = t.dataset.inv.split('|'); setQty(pid, sid, z, Math.max(0, +t.value || 0)); save(); toast('Остаток обновлён, покупатели видят его сразу'); render(); }
   if (t.id === 'photo' && t.files[0]){
     const r = new FileReader();
     const file = t.files[0], note = ($('#ask')?.value || '').trim();
@@ -1035,13 +1291,18 @@ document.addEventListener('change', e => {
       r.result.split(/\r?\n/).forEach(line => {
         const [name, sz, q] = line.split(/[;,]/).map(x => x && x.trim());
         const p = PRODUCTS.find(x => x.name.toLowerCase() === (name || '').toLowerCase());
-        if (p && st.inv[p.id][ui.cabStore] && sz && !isNaN(+q)){ st.inv[p.id][ui.cabStore][sz] = +q; n++; }
+        if (p && st.inv[p.id][ui.cabStore] && sz && !isNaN(+q)){ setQty(p.id, ui.cabStore, sz, +q); n++; }
       });
       save(); toast(n ? `Обновлено строк: ${n}` : 'Ни одна строка не совпала с товарами магазина'); render();
     };
     r.readAsText(t.files[0]);
   }
 });
+/* Новый остаток; если размер появился, а на него подписан покупатель, присылаем уведомление */
+function setQty(pid, sid, z, v){
+  const was = qty(pid, sid, z); st.inv[pid][sid][z] = v;
+  if (!was && v > 0 && st.subs.some(x => x.pid === pid && x.sz === z)) note(`Поступил размер ${z === 'one' ? '' : z + ' '}— ${P(pid).name} в «${S(sid).name}», ${S(sid).branch}`, 'stock');
+}
 function guideGo(k){
   if (k === 'reset'){ st = fresh(); ui = {...ui, mode:'buyer', tab:'home', stack:[], chat:[], lastLook:null}; save(); render(true); toast('Демо сброшено'); return; }
   if (!st.profile && k !== 'onb'){ st.profile = {city:'Тюмень', size:'S', shoe:'38', style:'классика', budget:15000}; save(); }
@@ -1051,10 +1312,12 @@ function guideGo(k){
   if (k === 'look'){ ui.chat = []; ui.stack = []; askStylist('Образ на учёбу до 15 000 ₽'); }
   if (k === 'product'){ go('product', {id:'p4'}); }
   if (k === 'bookings'){ const b = book('p4', 'stil1', qty('p4', 'stil1', st.profile.size) ? st.profile.size : 'M'); if (b){ save(); go('booking', {ids:[b.id]}); } else go('product', {id:'p4'}); }
-  if (k === 'cabinet'){ ui.mode = 'store'; ui.cabTab = 'bk'; ui.cabStore = 'stil1'; render(true); }
-  if (k === 'demand'){ ui.mode = 'store'; ui.cabTab = 'demand'; render(true); }
+  if (k === 'cabinet' || k === 'demand'){ ui.cabTab = k === 'cabinet' ? 'bk' : 'demand'; ui.cabStore = 'stil1'; ui.mode = 'store'; if (location.hash !== '#store') location.hash = 'store'; else render(true); }
 }
-render(true);
+/* Кабинет магазина — отдельный адрес #store со входом по SMS-коду, покупатель его не видит */
+function syncMode(){ ui.mode = location.hash === '#store' ? 'store' : 'buyer'; render(true); }
+addEventListener('hashchange', syncMode);
+syncMode();
 </script>
 
 </body></html>
